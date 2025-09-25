@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QuickDoc – Schneller Arzttermin (Demo)</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="container">
+    <a href="/">
+      <img src="/logo.png" alt="QuickDoc Logo" class="logo">
+    </a>
+    <div>
+      <h1>QuickDoc</h1>
+      <p>Finde den nächstmöglichen Termin bei verschiedenen Fachärzten in deiner Stadt.</p>
+    </div>
+  </header>
+
+  <section class="container card">
+    <div class="filters">
+      <label>
+        Fachrichtung
+        <select id="specialtySelect">
+          <option value="">Alle</option>
+        </select>
+      </label>
+      <label>
+        Stadt
+        <select id="citySelect">
+          <option value="">Alle</option>
+        </select>
+      </label>
+      <label>
+        Name
+        <input id="nameInput" placeholder="z.B. Meyer" />
+      </label>
+      <button id="searchBtn" class="btn btn-primary">Suchen</button>
+    </div>
+  </section>
+
+  <section class="container" id="results"></section>
+
+  <template id="doctor-card">
+    <div class="card doctor">
+      <div class="doctor__header">
+        <div class="doctor__title"></div>
+        <div class="doctor__subtitle"></div>
+      </div>
+      <div class="doctor__meta"></div>
+      <div class="doctor__next"></div>
+      <div class="doctor__actions">
+        <button class="btn btn-outline view-slots">Termine anzeigen</button>
+      </div>
+      <div class="slots hidden"></div>
+    </div>
+  </template>
+
+  <script src="./app.js"></script>
+    <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <span class="site-footer__brand">© <span id="year"></span> QuickDoc</span>
+      <nav class="site-footer__nav">
+        <a href="/impressum.html">Impressum</a>
+        <a href="#" id="openPrivacy">Datenschutz</a>
+        <a href="mailto:contact@quickdoc.example">Kontakt</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- Legal dialogs -->
+
+  <dialog id="privacyDialog" class="legal-dialog">
+    <form method="dialog">
+      <h2>Datenschutzerklärung</h2>
+      <p>Dies ist eine Demo-Anwendung. Es werden keine personenbezogenen Daten dauerhaft gespeichert.</p>
+      <ul>
+        <li>Verantwortlicher: QuickDoc (Demo)</li>
+        <li>Zweck: Funktionsdemo Terminbuchung</li>
+      </ul>
+      <div class="dialog-actions">
+        <button class="btn btn-outline">Schließen</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>

@@ -1,0 +1,113 @@
+/* QuickDoc – Corporate Design (Mint Pastel) */
+:root{
+  /* Brand palette */
+  --brand-bg: #CFF5E7;        /* Mint‑pastel background (match logo) */
+  --brand:    #11A39E;        /* Primary brand (buttons/links) */
+  --brand-2:  #0C7E79;        /* Darker shade for hover/active */
+  --ink:      #0F2D2C;        /* Headings / strong text */
+  --text:     #274241;        /* Body text */
+  --muted:    #5E7A79;        /* Secondary text */
+  --card:     #FFFFFF;        /* Card surface */
+  --card-2:   #F6FFFC;        /* Subtle tinted surface */
+  --stroke:   rgba(12,126,121,.14); /* Borders */
+  --shadow:   0 6px 24px rgba(12,126,121,.12), 0 2px 6px rgba(12,126,121,.08);
+  --radius:   14px;
+}
+
+/* Base reset */
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  color: var(--text);
+  background: radial-gradient(1200px 800px at 20% -10%, #E8FFF6 0%, transparent 60%),
+              radial-gradient(1000px 700px at 100% 0%, #D9FFF6 0%, transparent 55%),
+              var(--brand-bg);
+  line-height: 1.45;
+}
+
+/* Layout helpers */
+.container{ width:min(1100px, 92%); margin:24px auto; }
+
+/* Header / Hero */
+header.container{ display:flex; align-items:center; gap: clamp(16px, 3vw, 28px); padding: clamp(18px, 3.5vw, 28px) 0; }
+.logo{ height: clamp(48px, 6vw, 72px); width:auto; filter: drop-shadow(0 2px 6px rgba(0,0,0,.08)); }
+h1{ margin:0 0 6px; color: var(--ink); font-weight:800; }
+small{ color:var(--muted); font-weight:400; }
+
+/* Card */
+.card{ background: linear-gradient(180deg, var(--card) 0%, var(--card-2) 100%); border:1px solid var(--stroke); border-radius:var(--radius); padding:16px; box-shadow: var(--shadow); }
+
+/* Filters Bar */
+.filters{ display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:12px; align-items:end; }
+label{ display:flex; flex-direction:column; gap:6px; font-size:14px; color:var(--muted); }
+input, select{ padding:10px 12px; border:1px solid var(--stroke); border-radius:12px; font-size:16px; outline:none; background:#fff; color:var(--ink); transition: box-shadow .2s ease, border-color .2s ease; }
+input:focus, select:focus{ box-shadow:0 0 0 4px rgba(17,163,158,.12); border-color: var(--brand); }
+
+/* Buttons */
+button.btn{ padding:10px 14px; border-radius:12px; border:1px solid transparent; background:var(--brand); color:#fff; cursor:pointer; font-weight:700; box-shadow:0 6px 20px rgba(17,163,158,.25); transition: transform .04s ease, background-color .2s ease, box-shadow .2s ease; }
+button.btn:hover{ background: var(--brand-2); }
+button.btn:active{ transform: translateY(1px); }
+.btn-outline{ background:#fff; color:var(--brand); border-color: var(--brand); }
+.btn-outline:hover{ background: rgba(17,163,158,.08); }
+
+/* Results / Doctor cards */
+#results{ display:grid; gap:16px; margin-bottom: 64px; }
+.doctor{ display:grid; gap:10px; }
+.doctor__header{ display:flex; gap:12px; align-items:baseline; justify-content:space-between; }
+.doctor__title{ font-size:20px; font-weight:800; color: var(--ink); }
+.doctor__subtitle{ color:var(--muted); }
+.doctor__meta{ color:var(--text); }
+.doctor__next{ font-weight:700; color: var(--brand-2); }
+.hidden{ display:none; }
+
+/* Slots */
+.slots{ display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+.slot-btn{ border:1px solid var(--stroke); background:#fff; padding:8px 10px; border-radius:10px; cursor:pointer; }
+.slot-btn[disabled]{ opacity:.5; cursor:not-allowed; }
+
+/* Responsive */
+@media (max-width: 860px){ .filters{ grid-template-columns:1fr 1fr; } }
+@media (max-width: 520px){ header.container{ flex-direction:column; align-items:flex-start; } .filters{ grid-template-columns:1fr; } 
+
+/* Footer */
+.site-footer {
+  margin-top: 56px;
+  padding: 20px 0;
+  border-top: 1px solid var(--stroke);
+  background: rgba(255,255,255,.6);
+  backdrop-filter: blur(4px);
+}
+.site-footer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.site-footer__brand { color: var(--muted); }
+.site-footer__nav { display: flex; gap: 16px; }
+.site-footer__nav a {
+  color: var(--brand-2);
+  text-decoration: none;
+  font-weight: 600;
+}
+.site-footer__nav a:hover { text-decoration: underline; }
+
+/* Dialogs */
+.legal-dialog {
+  border: none;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+  max-width: 720px;
+  width: min(720px, 92%);
+}
+.legal-dialog::backdrop { background: rgba(0,0,0,.35); }
+.legal-dialog h2 { margin: 0 0 8px; color: var(--ink); }
+.legal-dialog p, .legal-dialog li { color: var(--text); }
+.legal-dialog .dialog-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}}

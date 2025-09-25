@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QuickDoc – Start</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="container">
+    <a href="/"><img src="/logo.png" alt="QuickDoc Logo" class="logo"></a>
+    <div>
+      <h1>QuickDoc <small>– Arzttermine schneller finden</small></h1>
+      <p>Die einfache Termin-Suche bei Fachärzt:innen in deiner Stadt.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card" style="display:grid; gap:12px;">
+      <h2>Willkommen</h2>
+      <p>Starte jetzt die Suche nach verfügbaren Terminen – gefiltert nach Fachrichtung, Stadt und Namen.</p>
+      <div>
+        <a class="btn btn-primary" href="/suche">Jetzt Termin finden</a>
+        <a class="btn btn-outline" href="/impressum.html">Impressum</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <span class="site-footer__brand">© <span id="year"></span> QuickDoc</span>
+      <nav class="site-footer__nav">
+        <a href="/suche">Termin finden</a>
+        <a href="/impressum.html">Impressum</a>
+        <a href="#" id="openPrivacy">Datenschutz</a>
+        <a href="mailto:contact@quickdoc.example">Kontakt</a>
+      </nav>
+    </div>
+  </footer>
+
+  <dialog id="privacyDialog" class="legal-dialog">
+    <form method="dialog">
+      <h2>Datenschutzerklärung</h2>
+      <p>Dies ist eine Demo-Anwendung. Es werden keine personenbezogenen Daten dauerhaft gespeichert.</p>
+      <div class="dialog-actions"><button class="btn btn-outline">Schließen</button></div>
+    </form>
+  </dialog>
+
+  <script>
+    (function(){
+      const y=document.getElementById('year'); if (y) y.textContent=new Date().getFullYear();
+      const prv=document.getElementById('openPrivacy'); const dlg=document.getElementById('privacyDialog');
+      if (prv && dlg) prv.addEventListener('click', e=>{ e.preventDefault(); dlg.showModal(); });
+    })();
+  </script>
+</body>
+</html>

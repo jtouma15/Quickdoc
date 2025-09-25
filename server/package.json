@@ -1,0 +1,16 @@
+{
+  "name": "quickdoc-server",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js",
+    "seed": "node seed.js",
+    "reset": "rm -f ../db/clinic.db && node seed.js && node index.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
