@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login – QuickDoc</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="container">
+    <a href="/"><img src="/logo.png" alt="QuickDoc Logo" class="logo"></a>
+    <div>
+      <h1>Login</h1>
+      <p>Melde dich an oder registriere dich, um Termine zu buchen.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <form id="loginForm" class="card" style="display:grid; gap:12px; max-width:520px;">
+      <label>E-Mail
+        <input id="loginEmail" type="email" placeholder="you@example.com" required>
+      </label>
+      <label>Passwort
+        <input id="loginPassword" type="password" placeholder="••••••••" required>
+      </label>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn btn-outline" type="button" id="toRegister">Registrieren</button>
+        <button class="btn btn-primary" type="submit" id="loginBtn">Login</button>
+      </div>
+      <div id="loginMsg" class="muted"></div>
+    </form>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <span class="site-footer__brand">© <span id="year"></span> QuickDoc</span>
+      <nav class="site-footer__nav">
+        <a href="/suche">Termin finden</a>
+        <a href="/impressum.html">Impressum</a>
+        <a href="#" id="openPrivacy">Datenschutz</a>
+        <a href="mailto:contact@quickdoc.example">Kontakt</a>
+      </nav>
+    </div>
+  </footer>
+
+  <dialog id="privacyDialog" class="legal-dialog">
+    <form method="dialog"><h2>Datenschutzerklärung</h2>
+      <p>Dies ist eine Demo-Anwendung.</p>
+      <div class="dialog-actions"><button class="btn btn-outline">Schließen</button></div>
+    </form>
+  </dialog>
+
+  <script src="./app.js"></script>
+
+  <script>
+    (function(){
+      // Jahr & Datenschutz-Dialog
+      const y=document.getElementById('year'); if (y) y.textContent=new Date().getFullYear();
+      const prv=document.getElementById('openPrivacy'); const dlg=document.getElementById('privacyDialog');
+      if (prv && dlg) prv.addEventListener('click', e=>{ e.preventDefault(); dlg.showModal(); });
+
+      // Enter auf Passwort triggert Submit automatisch, da es ein echtes <form> ist
+      const email = document.getElementById('loginEmail');
+      const toReg = document.getElementById('toRegister');
+
+      // Simulierte Registrierung: direkt einloggen und weiter zur Suche
+      toReg?.addEventListener('click', (e)=>{
+        e.preventDefault();
+        const em = (email?.value || 'user@example.com').trim();
+        localStorage.setItem('qd_auth_state', JSON.stringify({ loggedIn:true, email: em }));
+        alert('Registrierung erfolgreich (Demo)');
+        location.href = '/suche';
+      });
+    })();
+  </script>
+</body>
+</html>

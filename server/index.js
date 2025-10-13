@@ -4,6 +4,8 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import db from "./db.js";
+import session from "express-session";
+import bcrypt from "bcryptjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,11 +14,63 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use(session({
+  name: "qd.sid",
+  secret: process.env.SESSION_SECRET || "dev-quickdoc-secret",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: 1000 * 60 * 60 * 8
+  }
+}));
+
 // >>> wichtig: statische Dateien ausliefern
 app.use(express.static(path.resolve(__dirname, "../client"), { index: false }));
 
 // Helpers
 const nowIso = () => new Date().toISOString();
+
+const requireAuth = (req, res, next) => {
+  if (!req.session.user) return res.status(401).json({ error: "unauthorized" });
+  next();
+};
+
+// --- AUTH API ---
+app.post("/api/register", async (req, res) => {
+  const { email, password } = req.body || {};
+  if (!email || !password) return res.status(400).json({ error: "email and password required" });
+  const hash = await bcrypt.hash(password, 12);
+  try {
+    const stmt = db.prepare(`INSERT INTO users (email, password_hash) VALUES (?, ?)`);
+    const info = stmt.run(email.toLowerCase(), hash);
+    req.session.user = { id: info.lastInsertRowid, email: email.toLowerCase() };
+    res.json({ ok: true, user: req.session.user });
+  } catch (e) {
+    if (String(e).includes("UNIQUE")) return res.status(409).json({ error: "email already exists" });
+    res.status(500).json({ error: "internal_error" });
+  }
+});
+
+app.post("/api/login", async (req, res) => {
+  const { email, password } = req.body || {};
+  if (!email || !password) return res.status(400).json({ error: "email and password required" });
+  const user = db.prepare(`SELECT id, email, password_hash FROM users WHERE email = ?`).get(email.toLowerCase());
+  if (!user) return res.status(401).json({ error: "invalid_credentials" });
+  const ok = await bcrypt.compare(password, user.password_hash);
+  if (!ok) return res.status(401).json({ error: "invalid_credentials" });
+  req.session.user = { id: user.id, email: user.email };
+  res.json({ ok: true, user: req.session.user });
+});
+
+app.post("/api/logout", (req, res) => {
+  req.session.destroy(() => res.json({ ok: true }));
+});
+
+app.get("/api/me", (req, res) => {
+  res.json(req.session.user || null);
+});
 
 // API
 app.get("/api/specialties", (req, res) => {
@@ -92,7 +146,7 @@ app.get("/api/slots", (req, res) => {
   res.json(rows);
 });
 
-app.post("/api/book", (req, res) => {
+app.post("/api/book", requireAuth, (req, res) => {
   const { slot_id } = req.body;
   if (!slot_id) return res.status(400).json({ error: "slot_id is required" });
   const slot = db.prepare(`SELECT id, is_booked FROM appointment_slots WHERE id = ?`).get(Number(slot_id));
@@ -100,6 +154,69 @@ app.post("/api/book", (req, res) => {
   if (slot.is_booked) return res.status(409).json({ error: "slot already booked" });
   db.prepare(`UPDATE appointment_slots SET is_booked = 1 WHERE id = ?`).run(Number(slot_id));
   res.json({ ok: true });
+});
+
+// --- RATINGS API ---
+// Sammel-Statistiken für mehrere Ärzte (für Ergebnisliste)
+app.get("/api/ratings/stats", (req, res) => {
+  const ids = String(req.query.ids || "")
+    .split(",")
+    .map(s => parseInt(s.trim(), 10))
+    .filter(n => Number.isFinite(n));
+  if (!ids.length) return res.json({ stats: [] });
+
+  const placeholders = ids.map(() => "?").join(",");
+  const rows = db.prepare(`
+    SELECT doctor_id,
+           ROUND(AVG(score), 2) AS avg_rating,
+           COUNT(*) AS rating_count
+    FROM ratings
+    WHERE doctor_id IN (${placeholders})
+    GROUP BY doctor_id
+  `).all(...ids);
+
+  res.json({ stats: rows });
+});
+
+// Bewertungen eines Arztes abrufen (Liste + Stats)
+app.get("/api/doctors/:id/ratings", (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (!Number.isFinite(id)) return res.status(400).json({ error: "bad_id" });
+
+  const list = db.prepare(`
+    SELECT id, score, comment, created_at
+    FROM ratings
+    WHERE doctor_id = ?
+    ORDER BY created_at DESC
+    LIMIT 50
+  `).all(id);
+
+  const stat = db.prepare(`
+    SELECT ROUND(AVG(score),2) AS avg_rating, COUNT(*) AS rating_count
+    FROM ratings WHERE doctor_id = ?
+  `).get(id) || { avg_rating: null, rating_count: 0 };
+
+  res.json({ ratings: list, ...stat });
+});
+
+// Bewertung anlegen (1..5 Sterne + optional Kommentar)
+app.post("/api/doctors/:id/ratings", (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const { score, comment } = req.body || {};
+  if (!Number.isFinite(id)) return res.status(400).json({ error: "bad_id" });
+  const s = parseInt(score, 10);
+  if (!(s >= 1 && s <= 5)) return res.status(400).json({ error: "score_1_5" });
+
+  db.prepare(`
+    INSERT INTO ratings (doctor_id, score, comment) VALUES (?, ?, ?)
+  `).run(id, s, (comment || "").toString().slice(0, 500));
+
+  const stat = db.prepare(`
+    SELECT ROUND(AVG(score),2) AS avg_rating, COUNT(*) AS rating_count
+    FROM ratings WHERE doctor_id = ?
+  `).get(id) || { avg_rating: s, rating_count: 1 };
+
+  res.json({ ok: true, ...stat });
 });
 
 // >>> wichtig: Root-Route: wenn vorhanden, home.html ausliefern, sonst index.html

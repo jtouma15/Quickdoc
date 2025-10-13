@@ -12,4 +12,26 @@ const db = new Database(dbPath, { verbose: null });
 db.pragma("foreign_keys = ON");
 db.pragma("journal_mode = WAL");
 
+// --- Auth: Users table (if not exists)
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`);
+
+// --- Ratings: Doctors can be rated with stars and comments ---
+db.exec(`
+  CREATE TABLE IF NOT EXISTS ratings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    doctor_id INTEGER NOT NULL,
+    score INTEGER NOT NULL CHECK(score BETWEEN 1 AND 5),
+    comment TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE
+  );
+`);
+
 export default db;

@@ -7,13 +7,16 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <header class="container">
+  <header class="container header-with-login">
     <a href="/">
       <img src="/logo.png" alt="QuickDoc Logo" class="logo">
     </a>
     <div>
       <h1>QuickDoc</h1>
       <p>Finde den nächstmöglichen Termin bei verschiedenen Fachärzten in deiner Stadt.</p>
+    </div>
+    <div class="header-right">
+      <a href="/login.html" id="loginIconLink" title="Login" class="login-text">Login</a>
     </div>
   </header>
 
@@ -61,6 +64,8 @@
     <div class="container site-footer__inner">
       <span class="site-footer__brand">© <span id="year"></span> QuickDoc</span>
       <nav class="site-footer__nav">
+        <a href="/suche">Termin finden</a>
+        <a href="/login.html" id="loginLink">Login</a>
         <a href="/impressum.html">Impressum</a>
         <a href="#" id="openPrivacy">Datenschutz</a>
         <a href="mailto:contact@quickdoc.example">Kontakt</a>

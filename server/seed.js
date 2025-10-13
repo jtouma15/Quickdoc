@@ -3,6 +3,7 @@ import db from "./db.js";
 // Drop & Create schema
 db.exec(`
   DROP TABLE IF EXISTS appointment_slots;
+  DROP TABLE IF EXISTS ratings;
   DROP TABLE IF EXISTS doctor_locations;
   DROP TABLE IF EXISTS doctors;
   DROP TABLE IF EXISTS specialties;
@@ -45,6 +46,15 @@ db.exec(`
     start_time TEXT NOT NULL,    -- ISO string
     duration_min INTEGER NOT NULL DEFAULT 20,
     is_booked INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (doctor_id) REFERENCES doctors(id)
+  );
+
+  CREATE TABLE ratings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    doctor_id INTEGER NOT NULL,
+    score INTEGER NOT NULL CHECK(score BETWEEN 1 AND 5),
+    comment TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (doctor_id) REFERENCES doctors(id)
   );
 `);
@@ -115,6 +125,39 @@ for (let i = 0; i < 40; i++) {
   for (const lid of locs) insDocLoc.run(docId, lid);
 
   doctorIds.push(docId);
+}
+
+// Seed ratings: each doctor gets a varied distribution and some comments
+const insRating = db.prepare(`INSERT INTO ratings (doctor_id, score, comment) VALUES (?, ?, ?)`);
+const sampleComments = [
+  "Sehr freundlich und kompetent.",
+  "Kurze Wartezeit, alles top organisiert.",
+  "Hat sich Zeit genommen und gut erklärt.",
+  "Terminverschiebung, sonst okay.",
+  "Tolles Team und moderne Praxis.",
+  "Ein bisschen lange gewartet, aber gute Behandlung.",
+  "Fühlte mich sehr gut aufgehoben.",
+  "Empfehlenswert!",
+  "Würde wieder hingehen.",
+  "Nicht ganz zufrieden, zu kurz.",
+];
+
+function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+for (const dId of doctorIds) {
+  // Jede Ärztin/jeder Arzt 3–18 Bewertungen
+  const n = 3 + Math.floor(Math.random()*16);
+  // zufälliger Ziel-Mittelwert ~ zwischen 2.8 und 4.9
+  const target = 2.8 + Math.random() * 2.1;
+  for (let i = 0; i < n; i++) {
+    // Normalverteilung um target (grob über addierte Uniforms)
+    const jitter = (Math.random()+Math.random()+Math.random())/3 - 0.5; // ~-0.5..0.5
+    const raw = target + jitter;
+    const score = clamp(Math.round(raw), 1, 5);
+    const withComment = Math.random() < 0.55; // ~55% mit Kommentar
+    const comment = withComment ? sampleComments[Math.floor(Math.random()*sampleComments.length)] : null;
+    insRating.run(dId, score, comment);
+  }
 }
 
 // Generate appointment slots next 14 days, 09:00–16:00 each hour (book some)

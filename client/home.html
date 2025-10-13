@@ -7,30 +7,112 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <header class="container">
+  <header class="container header-with-login">
     <a href="/"><img src="/logo.png" alt="QuickDoc Logo" class="logo"></a>
     <div>
       <h1>QuickDoc <small>– Arzttermine schneller finden</small></h1>
       <p>Die einfache Termin-Suche bei Fachärzt:innen in deiner Stadt.</p>
     </div>
+    <div class="header-right">
+      <a href="javascript:void(0)" id="loginButton" class="login-text" title="Login">Login</a>
+    </div>
   </header>
 
-  <main class="container">
-    <section class="card" style="display:grid; gap:12px;">
-      <h2>Willkommen</h2>
-      <p>Starte jetzt die Suche nach verfügbaren Terminen – gefiltert nach Fachrichtung, Stadt und Namen.</p>
-      <div>
+  <main class="container home">
+  <!-- Hero -->
+  <section class="card hero hero--split">
+    <div class="hero__copy">
+      <h1>Willkommen</h1>
+      <p class="hero__lead">Starte jetzt die Suche nach verfügbaren Terminen – gefiltert nach Fachrichtung, Stadt und Namen.</p>
+
+      <ul class="hero__bullets">
+        <li>✔︎ In <strong>2 Minuten</strong> zum Termin</li>
+        <li>✔︎ <strong>Kostenlos</strong></li>
+        <li>✔︎ <strong>Live-Verfügbarkeit</strong> der Praxen</li>
+      </ul>
+
+      <div class="hero__cta">
         <a class="btn btn-primary" href="/suche">Jetzt Termin finden</a>
-        <a class="btn btn-outline" href="/impressum.html">Impressum</a>
+        <a class="btn btn-outline" href="#how">So funktioniert’s</a>
       </div>
-    </section>
-  </main>
+    
+    </div>
+
+    <div class="hero__media" aria-hidden="true">
+      <img src="/img/hero.jpg" alt="Ärztin mit Laptop" class="hero__img">
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features">
+    <article class="card feature">
+      <img src="/img/feature-fachrichtungen.jpg" alt="Fachrichtungen" class="feature__img">
+      <h3>Fachrichtungen</h3>
+      <p>Suche gezielt nach Kardiologie, Dermatologie, Orthopädie & mehr.</p>
+    </article>
+    <article class="card feature">
+      <img src="/img/feature-standorte.jpg" alt="Standorte" class="feature__img">
+      <h3>Standorte</h3>
+      <p>Filter nach Städten & Praxis-Standorten – schneller zur Auswahl.</p>
+    </article>
+    <article class="card feature">
+      <img src="/img/feature-termine.jpg" alt="Freie Termine" class="feature__img">
+      <h3>Freie Termine</h3>
+      <p>Live freie Slots sehen und direkt anfragen/buchen.</p>
+    </article>
+  </section>
+
+  <!-- How it works -->
+  <section class="card how" id="how">
+    <h2>So funktioniert’s</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-icon">1</div>
+        <h3>Filter wählen</h3>
+        <p>Fachrichtung, Stadt oder Name auswählen.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">2</div>
+        <h3>Arzt wählen</h3>
+        <p>Details ansehen & freien Termin finden.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">3</div>
+        <h3>Slot buchen</h3>
+        <p>Einloggen und Termin mit 1 Klick sichern.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="card testi">
+    <div class="testi__header">
+      <h2>Was Nutzer sagen</h2>
+      <div class="testi__dots" id="testiDots"></div>
+    </div>
+    <div class="testi__track" id="testiTrack">
+      <figure class="testi__item">
+        <blockquote>„Innerhalb von 2 Minuten einen Termin gefunden – mega!“</blockquote>
+        <figcaption>– Sarah K.</figcaption>
+      </figure>
+      <figure class="testi__item">
+        <blockquote>„Die Filter sind super übersichtlich, spart mir Telefonate.“</blockquote>
+        <figcaption>– Jonas P.</figcaption>
+      </figure>
+      <figure class="testi__item">
+        <blockquote>„Genau mein Ding: eingeben, klicken, Termin steht.“</blockquote>
+        <figcaption>– Mira L.</figcaption>
+      </figure>
+    </div>
+  </section>
+</main>
 
   <footer class="site-footer">
     <div class="container site-footer__inner">
       <span class="site-footer__brand">© <span id="year"></span> QuickDoc</span>
       <nav class="site-footer__nav">
         <a href="/suche">Termin finden</a>
+        <a href="/login.html" id="loginLink">Login</a>
         <a href="/impressum.html">Impressum</a>
         <a href="#" id="openPrivacy">Datenschutz</a>
         <a href="mailto:contact@quickdoc.example">Kontakt</a>
@@ -53,5 +135,32 @@
       if (prv && dlg) prv.addEventListener('click', e=>{ e.preventDefault(); dlg.showModal(); });
     })();
   </script>
+<script>
+  // Mini-Slider für Testimonials (autoplay + Dots)
+  (function(){
+    const track = document.getElementById('testiTrack');
+    const dotsC = document.getElementById('testiDots');
+    if(!track || !dotsC) return;
+    const items = Array.from(track.children);
+    let i = 0;
+
+    items.forEach((_, idx) => {
+      const b = document.createElement('button');
+      b.className = 'dot' + (idx===0?' dot--active':'');
+      b.addEventListener('click', ()=> go(idx));
+      dotsC.appendChild(b);
+    });
+
+    function go(n){
+      i = (n + items.length) % items.length;
+      track.style.transform = `translateX(${-i*100}%)`;
+      Array.from(dotsC.children).forEach((d, idx)=> d.classList.toggle('dot--active', idx===i));
+    }
+
+    let t = setInterval(()=> go(i+1), 4000);
+    dotsC.addEventListener('mouseenter', ()=> clearInterval(t));
+    dotsC.addEventListener('mouseleave', ()=> t = setInterval(()=> go(i+1), 4000));
+  })();
+</script>
 </body>
 </html>
