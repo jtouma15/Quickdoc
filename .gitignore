@@ -18,3 +18,4 @@ DerivedData/
 .build/
 *.xcuserdatad/
 *.xcworkspace/xcuserdata/
+.idea/
