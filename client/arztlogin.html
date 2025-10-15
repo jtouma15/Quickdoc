@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QuickDoc – Arzt registrieren</title>
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<!-- Header wie auf Startseite -->
+<header class="container header-with-login">
+    <a href="/"><img src="/logo.png" alt="QuickDoc Logo" class="logo"></a>
+    <div>
+        <h1>QuickDoc <small>– Arzttermine schneller finden</small></h1>
+        <p>Registrieren Sie Ihre Praxis und verwalten Sie Termine online.</p>
+    </div>
+    <div class="header-right">
+        <a href="/login.html" class="login-text" title="Login">Login</a>
+    </div>
+</header>
+
+<main class="container">
+    <section class="card" style="max-width: 900px; margin: 2rem auto;">
+        <h2 style="margin-bottom: .5rem;">Arzt-Registrierung</h2>
+        <p class="muted" style="margin-top: 0;">Kostenlos starten. Felder mit * sind Pflicht.</p>
+
+        <!-- FORM -->
+        <form id="docSignup" novalidate>
+            <!-- Name -->
+            <div class="grid grid--2">
+                <div class="form-field">
+                    <label for="firstName">Vorname *</label>
+                    <input id="firstName" name="firstName" type="text" autocomplete="given-name" required />
+                    <small class="error"></small>
+                </div>
+                <div class="form-field">
+                    <label for="lastName">Nachname *</label>
+                    <input id="lastName" name="lastName" type="text" autocomplete="family-name" required />
+                    <small class="error"></small>
+                </div>
+            </div>
+
+            <!-- Kontakt -->
+            <div class="form-field">
+                <label for="email">E-Mail-Adresse *</label>
+                <input id="email" name="email" type="email" inputmode="email" autocomplete="email" required />
+                <small class="error"></small>
+            </div>
+
+            <div class="form-field">
+                <label for="phone">Telefonnummer <span class="muted">(optional)</span></label>
+                <input id="phone" name="phone" type="tel" placeholder="Beispiel: 0176 1234567"
+                       pattern="^[+0-9 ()/-]{6,}$" />
+                <small class="error"></small>
+            </div>
+
+            <!-- Anschrift (einfaches Textfeld; später ersetzbar durch Autocomplete) -->
+            <div class="form-field">
+                <label for="address">Anschrift *</label>
+                <input id="address" name="address" type="text" placeholder="Straße Hausnr., PLZ Ort" required />
+                <small class="error"></small>
+            </div>
+
+            <!-- Fachgebiet -->
+            <div class="form-field">
+                <label for="specialty">Fachgebiet *</label>
+                <div class="select">
+                    <select id="specialty" name="specialty" required>
+                        <option value="">Wählen Sie Ihr Fachgebiet</option>
+                        <option>Kardiologie</option>
+                        <option>Dermatologie</option>
+                        <option>Orthopädie</option>
+                        <option>Allgemeinmedizin</option>
+                        <option>HNO</option>
+                        <option>Gynäkologie</option>
+                        <option>Neurologie</option>
+                        <option>Urologie</option>
+                        <option>Zahnmedizin</option>
+                    </select>
+                </div>
+                <small class="error"></small>
+            </div>
+
+            <!-- Beschäftigungsverhältnis -->
+            <fieldset class="form-field">
+                <legend>Beschäftigungsverhältnis *</legend>
+                <div class="radio-row">
+                    <label class="radio">
+                        <input type="radio" name="employment" value="self" required checked />
+                        <span>Selbstständig</span>
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="employment" value="employed" />
+                        <span>Angestellt</span>
+                    </label>
+                </div>
+                <small class="error"></small>
+            </fieldset>
+
+            <!-- Nur wenn "Angestellt": Klinik/Praxisname -->
+            <div class="form-field hide" id="employerGroup">
+                <label for="employer">Praxis / Klinik <span class="muted">(nur für Angestellte)</span></label>
+                <input id="employer" name="employer" type="text" />
+                <small class="error"></small>
+            </div>
+
+            <!-- Berufsnummer optional -->
+            <div class="form-field">
+                <label for="lanr">Berufsnachweis <span class="muted">(optional, LANR / ZANR)</span></label>
+                <input id="lanr" name="lanr" type="text" inputmode="numeric" pattern="^[0-9A-Za-z\- ]{6,}$" />
+                <small class="error"></small>
+            </div>
+
+            <!-- Passwort -->
+            <div class="form-field">
+                <label for="password">Passwort *</label>
+                <div class="input-group">
+                    <input id="password" name="password" type="password" minlength="8" required />
+                    <button type="button" class="btn btn-outline btn-icon" id="pwToggle" aria-label="Passwort anzeigen">
+                        👁️
+                    </button>
+                </div>
+                <div id="pwMeter" class="pw-meter" aria-hidden="true"></div>
+                <small class="muted">Mindestens 8 Zeichen. Am besten mit Zahl & Sonderzeichen.</small>
+                <small class="error"></small>
+            </div>
+
+            <!-- AGB / Datenschutz -->
+            <div class="form-field">
+                <label class="checkbox">
+                    <input id="acceptTos" type="checkbox" required />
+                    <span>Ich bestätige, dass ich die <a href="/agb.html" target="_blank" rel="noopener">Allgemeinen Geschäftsbedingungen</a> gelesen habe und sie akzeptiere.</span>
+                </label>
+                <small class="error"></small>
+            </div>
+
+            <div class="form-field">
+                <label class="checkbox">
+                    <input id="acceptPrivacy" type="checkbox" required />
+                    <span>Ich erkläre, dass ich die <a href="/privacy.html" target="_blank" rel="noopener">Vereinbarung über den Schutz personenbezogener Daten</a> und die <a href="/datenschutz.html" target="_blank" rel="noopener">Datenschutzerklärung</a> gelesen habe und akzeptiere.</span>
+                </label>
+                <small class="error"></small>
+            </div>
+
+            <!-- CTA -->
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit">Kostenlos registrieren</button>
+                <a class="btn btn-outline" href="/login.html">Ich habe schon ein Konto</a>
+            </div>
+
+            <!-- Fake-success -->
+            <p id="formSuccess" class="success hide" role="status">✓ Registriert. Prüfen Sie bitte Ihren Posteingang.</p>
+        </form>
+    </section>
+</main>
+
+<!-- Footer wie gehabt -->
+<footer class="site-footer">
+    <div class="container site-footer__inner">
+        <span class="site-footer__brand">© <span id="year"></span> QuickDoc</span>
+        <nav class="site-footer__nav">
+            <a href="/suche">Termin finden</a>
+            <a href="/impressum.html">Impressum</a>
+            <a href="#" id="openPrivacy">Datenschutz</a>
+            <a href="mailto:contact@quickdoc.example">Kontakt</a>
+        </nav>
+    </div>
+</footer>
+
+<!-- Datenschutz-Dialog (gleich wie Start) -->
+<dialog id="privacyDialog" class="legal-dialog">
+    <form method="dialog">
+        <h2>Datenschutzerklärung</h2>
+        <p>Dies ist eine Demo-Anwendung. Es werden keine personenbezogenen Daten dauerhaft gespeichert.</p>
+        <div class="dialog-actions"><button class="btn btn-outline">Schließen</button></div>
+    </form>
+</dialog>
+
+<script>
+    // Footer-Jahr + Datenschutz-Dialog
+    (function(){
+        const y=document.getElementById('year'); if (y) y.textContent=new Date().getFullYear();
+        const prv=document.getElementById('openPrivacy'); const dlg=document.getElementById('privacyDialog');
+        if (prv && dlg) prv.addEventListener('click', e=>{ e.preventDefault(); dlg.showModal(); });
+    })();
+
+    // UI-Logik Formular
+    (function(){
+        const f = document.getElementById('docSignup');
+        const employerGroup = document.getElementById('employerGroup');
+        const pw = document.getElementById('password');
+        const pwToggle = document.getElementById('pwToggle');
+        const pwMeter = document.getElementById('pwMeter');
+        const success = document.getElementById('formSuccess');
+
+        // Employment toggle
+        f.querySelectorAll('input[name="employment"]').forEach(r => {
+            r.addEventListener('change', () => {
+                const isEmp = f.elements['employment'].value === 'employed';
+                employerGroup.classList.toggle('hide', !isEmp);
+                f.elements['employer'].toggleAttribute('required', isEmp);
+            });
+        });
+
+        // Password toggle
+        pwToggle.addEventListener('click', () => {
+            pw.type = pw.type === 'password' ? 'text' : 'password';
+        });
+
+        // Mini-Stärkemeter (simpel, clientseitig)
+        pw.addEventListener('input', () => {
+            const v = pw.value;
+            let score = 0;
+            if (v.length >= 8) score++;
+            if (/[A-Z]/.test(v)) score++;
+            if (/[0-9]/.test(v)) score++;
+            if (/[^A-Za-z0-9]/.test(v)) score++;
+            pwMeter.dataset.score = String(score);
+            pwMeter.setAttribute('aria-hidden', 'false');
+        });
+
+        // Validation
+        function setError(el, msg){
+            const field = el.closest('.form-field');
+            field?.classList.add('has-error');
+            const small = field?.querySelector('.error');
+            if (small) small.textContent = msg || 'Bitte prüfen.';
+        }
+        function clearError(el){
+            const field = el.closest('.form-field');
+            field?.classList.remove('has-error');
+            const small = field?.querySelector('.error');
+            if (small) small.textContent = '';
+        }
+
+        f.addEventListener('submit', (e) => {
+            e.preventDefault();
+            success.classList.add('hide');
+
+            // HTML5 validity + eigene Checks
+            let ok = true;
+            Array.from(f.elements).forEach(el => {
+                if (!(el instanceof HTMLInputElement || el instanceof HTMLSelectElement)) return;
+                clearError(el);
+                if (el.hasAttribute('required') && !el.value.trim()){
+                    setError(el, 'Pflichtfeld.');
+                    ok = false;
+                } else if (el.id === 'email' && el.value && !/^\S+@\S+\.\S+$/.test(el.value)){
+                    setError(el, 'Ungültige E-Mail.');
+                    ok = false;
+                } else if (el.id === 'password' && el.value.length < 8){
+                    setError(el, 'Mindestens 8 Zeichen.');
+                    ok = false;
+                } else if (el.id === 'phone' && el.value && !el.checkValidity()){
+                    setError(el, 'Ungültige Telefonnummer.');
+                    ok = false;
+                }
+            });
+
+            if (!document.getElementById('acceptTos').checked) {
+                setError(document.getElementById('acceptTos'), 'Erforderlich.');
+                ok = false;
+            }
+            if (!document.getElementById('acceptPrivacy').checked) {
+                setError(document.getElementById('acceptPrivacy'), 'Erforderlich.');
+                ok = false;
+            }
+
+            if (!ok) return;
+
+            // Hier würdest du per fetch() an dein Backend posten.
+            // Demo: Erfolgsmeldung anzeigen.
+            success.classList.remove('hide');
+            f.scrollIntoView({behavior: 'smooth', block: 'start'});
+        });
+    })();
+</script>
+</body>
+</html>

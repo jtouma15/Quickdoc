@@ -335,3 +335,47 @@ a:hover { text-decoration: underline; text-decoration-color: currentColor; }
   .site-header__nav{ gap: 10px; }
   .site-header__nav a{ font-size: 14px; }
 }
+/* ---- Forms (QuickDoc) ---- */
+.form-field { margin-bottom: 1rem; }
+.form-field label, .form-field legend { display:block; font-weight:600; margin-bottom:.4rem; }
+.form-field input, .form-field select, .form-field .select select {
+    width:100%; padding:.75rem .9rem; border:1px solid var(--border, #cfd8dc);
+    border-radius:.6rem; background:#fff; outline:none;
+}
+.form-field input:focus, .form-field select:focus { border-color: var(--mint, #7bd8c1); box-shadow: 0 0 0 .15rem rgba(123,216,193,.25); }
+
+.grid { display:grid; gap:1rem; }
+.grid--2 { grid-template-columns: 1fr 1fr; }
+@media (max-width: 720px){ .grid--2 { grid-template-columns: 1fr; } }
+
+.select { position:relative; }
+.select:after {
+    content:""; position:absolute; right:.9rem; top:50%; width:.6rem; height:.6rem; border-right:2px solid #546e7a; border-bottom:2px solid #546e7a; transform:translateY(-50%) rotate(45deg); pointer-events:none;
+}
+
+.radio-row { display:flex; gap:1rem; }
+.radio input { margin-right:.5rem; transform: translateY(1px); }
+
+.input-group { display:flex; gap:.5rem; }
+.input-group input { flex:1; }
+.btn-icon { padding-inline:.75rem; }
+
+.pw-meter { height:.35rem; background:#eceff1; border-radius:999px; margin-top:.5rem; position:relative; overflow:hidden; }
+.pw-meter::after {
+    content:""; position:absolute; inset:0; width:0%;
+    background: linear-gradient(90deg, #ef5350, #ffca28, #7bd8c1);
+    transition: width .25s ease;
+}
+.pw-meter[data-score="1"]::after { width:25%; }
+.pw-meter[data-score="2"]::after { width:50%; }
+.pw-meter[data-score="3"]::after { width:75%; }
+.pw-meter[data-score="4"]::after { width:100%; }
+
+.form-actions { display:flex; gap:.75rem; align-items:center; margin-top:1.25rem; }
+
+.muted { color:#607d8b; font-size:.95rem; }
+.success { margin-top:1rem; padding:.75rem 1rem; border-radius:.5rem; background:#e8f6f2; color:#0f5132; border:1px solid #bfe9de; }
+.error { color:#c62828; display:block; margin-top:.35rem; min-height:1.1em; }
+.has-error input, .has-error select { border-color:#c62828; }
+
+.hide { display:none !important; }
