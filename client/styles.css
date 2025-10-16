@@ -379,3 +379,105 @@ a:hover { text-decoration: underline; text-decoration-color: currentColor; }
 .has-error input, .has-error select { border-color:#c62828; }
 
 .hide { display:none !important; }
+/* Nur EIN Dropdown-Pfeil: native Pfeile ausblenden */
+.select--no-native select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none !important;
+    padding-right: 2.25rem; /* Platz für unseren Pfeil */
+}
+/* dein bestehender Custom-Pfeil via .select:after bleibt – ergibt genau 1 Pfeil */
+
+/* Rechtstexte: Lesbarkeit */
+.form-field.legal .checkbox span {
+    line-height: 1.45;
+}
+.form-field.legal a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* Buttons gleich groß nebeneinander */
+.form-actions--equal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .75rem;
+}
+.form-actions--equal .btn {
+    width: 100%;
+    justify-content: center;
+}
+@media (max-width: 520px){
+    .form-actions--equal {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Fehlerzustand */
+.has-error input, .has-error select { border-color:#c62828; }
+.error { color:#c62828; display:block; margin-top:.35rem; min-height:1.1em; }
+/* --- Legal-Checkbox: in einer Zeile, Checkbox am Satzende (rechts) --- */
+.form-field.legal .checkbox{
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+    flex-direction: row-reverse;     /* Checkbox rechts, Text links */
+    justify-content: flex-end;
+    cursor: pointer;
+}
+
+.form-field.legal .checkbox input[type="checkbox"]{
+    flex-shrink: 0;
+    margin-top: .2rem;               /* optische Ausrichtung zur ersten Textzeile */
+}
+
+.form-field.legal .checkbox span{
+    flex: 1;                         /* Text darf umbrechen */
+    display: inline;
+    line-height: 1.45;
+}
+
+.form-field.legal .checkbox a{
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+/* Legal-Layout: Text links volle Breite, Checkbox ganz rechts, Fehlermeldung darunter */
+.form-field.legal{
+    display: grid !important;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    column-gap: 12px;
+}
+.form-field.legal .legal__text{
+    grid-column: 1;
+    line-height: 1.5;
+    display: block !important;
+}
+.form-field.legal .legal__check{
+    grid-column: 2;
+    margin-top: .25rem;
+    flex-shrink: 0;
+}
+.form-field.legal .error{
+    grid-column: 1 / -1;
+    margin-top: .35rem;
+}
+
+/* alte Flex-Regeln sicher aushebeln */
+.form-field.legal .checkbox{ display: block !important; }
+/* === Checkbox rechts etwas nach innen ziehen === */
+
+/* Grid-Variante (Label links + <input class="legal__check"> rechts) */
+.form-field.legal{
+    padding-right: 280px !important;          /* Abstand vom rechten Kartenrand */
+}
+.form-field.legal .legal__check{
+    justify-self: end;                        /* bleibt rechts in ihrer Spalte */
+}
+
+/* Falls du irgendwo noch die "Label enthält Input"-Variante nutzt,
+   ziehen wir die absolut positionierte Box auch 24px vom Rand weg. */
+.form-field.legal .checkbox input[type="checkbox"]{
+    right: 280px !important;
+}

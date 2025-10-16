@@ -49,22 +49,21 @@
 
             <div class="form-field">
                 <label for="phone">Telefonnummer <span class="muted">(optional)</span></label>
-                <input id="phone" name="phone" type="tel" placeholder="Beispiel: 0176 1234567"
-                       pattern="^[+0-9 ()/-]{6,}$" />
+                <input id="phone" name="phone" type="tel" placeholder="Beispiel: 0176 1234567" pattern="^[+0-9 ()/-]{6,}$" />
                 <small class="error"></small>
             </div>
 
-            <!-- Anschrift (einfaches Textfeld; später ersetzbar durch Autocomplete) -->
+            <!-- Anschrift -->
             <div class="form-field">
                 <label for="address">Anschrift *</label>
                 <input id="address" name="address" type="text" placeholder="Straße Hausnr., PLZ Ort" required />
                 <small class="error"></small>
             </div>
 
-            <!-- Fachgebiet -->
+            <!-- Fachgebiet (nur EIN Pfeil) -->
             <div class="form-field">
                 <label for="specialty">Fachgebiet *</label>
-                <div class="select">
+                <div class="select select--no-native">
                     <select id="specialty" name="specialty" required>
                         <option value="">Wählen Sie Ihr Fachgebiet</option>
                         <option>Kardiologie</option>
@@ -82,73 +81,68 @@
             </div>
 
             <!-- Beschäftigungsverhältnis -->
-            <fieldset class="form-field">
-                <legend>Beschäftigungsverhältnis *</legend>
-                <div class="radio-row">
-                    <label class="radio">
-                        <input type="radio" name="employment" value="self" required checked />
-                        <span>Selbstständig</span>
-                    </label>
-                    <label class="radio">
-                        <input type="radio" name="employment" value="employed" />
-                        <span>Angestellt</span>
-                    </label>
-                </div>
+            <div class="form-field select select--no-native">
+                <label for="employment">Beschäftigungsverhältnis *</label>
+                <select id="employment" name="employment" required>
+                    <option value="" disabled selected hidden>Wählen Sie Ihr Beschäftigungsverhältnis</option>
+                    <option value="self">Selbstständig</option>
+                    <option value="employed">Angestellt</option>
+                </select>
                 <small class="error"></small>
-            </fieldset>
+            </div>
 
-            <!-- Nur wenn "Angestellt": Klinik/Praxisname -->
             <div class="form-field hide" id="employerGroup">
                 <label for="employer">Praxis / Klinik <span class="muted">(nur für Angestellte)</span></label>
                 <input id="employer" name="employer" type="text" />
                 <small class="error"></small>
             </div>
 
-            <!-- Berufsnummer optional -->
-            <div class="form-field">
-                <label for="lanr">Berufsnachweis <span class="muted">(optional, LANR / ZANR)</span></label>
-                <input id="lanr" name="lanr" type="text" inputmode="numeric" pattern="^[0-9A-Za-z\- ]{6,}$" />
-                <small class="error"></small>
-            </div>
-
-            <!-- Passwort -->
+            <!-- Passwort (nur Sternchen, kein Toggle) + Wiederholen -->
             <div class="form-field">
                 <label for="password">Passwort *</label>
-                <div class="input-group">
-                    <input id="password" name="password" type="password" minlength="8" required />
-                    <button type="button" class="btn btn-outline btn-icon" id="pwToggle" aria-label="Passwort anzeigen">
-                        👁️
-                    </button>
-                </div>
-                <div id="pwMeter" class="pw-meter" aria-hidden="true"></div>
-                <small class="muted">Mindestens 8 Zeichen. Am besten mit Zahl & Sonderzeichen.</small>
-                <small class="error"></small>
-            </div>
-
-            <!-- AGB / Datenschutz -->
-            <div class="form-field">
-                <label class="checkbox">
-                    <input id="acceptTos" type="checkbox" required />
-                    <span>Ich bestätige, dass ich die <a href="/agb.html" target="_blank" rel="noopener">Allgemeinen Geschäftsbedingungen</a> gelesen habe und sie akzeptiere.</span>
-                </label>
+                <input id="password" name="password" type="password" minlength="8" required />
+                <small class="muted">Mindestens 8 Zeichen.</small>
                 <small class="error"></small>
             </div>
 
             <div class="form-field">
-                <label class="checkbox">
-                    <input id="acceptPrivacy" type="checkbox" required />
-                    <span>Ich erkläre, dass ich die <a href="/privacy.html" target="_blank" rel="noopener">Vereinbarung über den Schutz personenbezogener Daten</a> und die <a href="/datenschutz.html" target="_blank" rel="noopener">Datenschutzerklärung</a> gelesen habe und akzeptiere.</span>
-                </label>
+                <label for="password2">Passwort wiederholen *</label>
+                <input id="password2" name="password2" type="password" minlength="8" required />
                 <small class="error"></small>
             </div>
 
-            <!-- CTA -->
-            <div class="form-actions">
+            <!-- AGB Checkbox -->
+            <div class="form-field legal">
+                <label for="acceptTos" class="legal__text">
+                    Ich bestätige, dass ich die
+                    <a href="/img/AGB_QuickDoc_GmbH.pdf" target="_blank" rel="noopener">
+                        Allgemeinen Geschäftsbedingungen
+                    </a>
+                    gelesen habe und akzeptiere.
+                </label>
+                <input id="acceptTos" type="checkbox" class="legal__check" required />
+                <small class="error"></small>
+            </div>
+
+            <!-- Datenschutz Checkbox -->
+            <div class="form-field legal">
+                <label for="acceptPrivacy" class="legal__text">
+                    Ich erkläre, dass ich die
+                    <a href=/img/Datenschutz+.pdf target="_blank" rel="noopener">
+                        Datenschutzerklärung
+                    </a>
+                    gelesen habe und akzeptiere.
+                </label>
+                <input id="acceptPrivacy" type="checkbox" class="legal__check" required />
+                <small class="error"></small>
+            </div>
+
+            <!-- CTAs: gleich groß -->
+            <div class="form-actions form-actions--equal">
                 <button class="btn btn-primary" type="submit">Kostenlos registrieren</button>
-                <a class="btn btn-outline" href="/login.html">Ich habe schon ein Konto</a>
+
             </div>
 
-            <!-- Fake-success -->
             <p id="formSuccess" class="success hide" role="status">✓ Registriert. Prüfen Sie bitte Ihren Posteingang.</p>
         </form>
     </section>
@@ -179,47 +173,33 @@
 <script>
     // Footer-Jahr + Datenschutz-Dialog
     (function(){
-        const y=document.getElementById('year'); if (y) y.textContent=new Date().getFullYear();
-        const prv=document.getElementById('openPrivacy'); const dlg=document.getElementById('privacyDialog');
-        if (prv && dlg) prv.addEventListener('click', e=>{ e.preventDefault(); dlg.showModal(); });
+        const y = document.getElementById('year');
+        if (y) y.textContent = new Date().getFullYear();
+
+        const prv = document.getElementById('openPrivacy');
+        const dlg = document.getElementById('privacyDialog');
+        if (prv && dlg) prv.addEventListener('click', e => { e.preventDefault(); dlg.showModal(); });
     })();
 
     // UI-Logik Formular
     (function(){
         const f = document.getElementById('docSignup');
+        if (!f) return; // falls auf Seiten ohne Formular eingebunden
+
         const employerGroup = document.getElementById('employerGroup');
-        const pw = document.getElementById('password');
-        const pwToggle = document.getElementById('pwToggle');
-        const pwMeter = document.getElementById('pwMeter');
         const success = document.getElementById('formSuccess');
 
         // Employment toggle
         f.querySelectorAll('input[name="employment"]').forEach(r => {
             r.addEventListener('change', () => {
                 const isEmp = f.elements['employment'].value === 'employed';
-                employerGroup.classList.toggle('hide', !isEmp);
-                f.elements['employer'].toggleAttribute('required', isEmp);
+                if (employerGroup) employerGroup.classList.toggle('hide', !isEmp);
+                const empInput = f.elements['employer'];
+                if (empInput) empInput.toggleAttribute('required', isEmp);
             });
         });
 
-        // Password toggle
-        pwToggle.addEventListener('click', () => {
-            pw.type = pw.type === 'password' ? 'text' : 'password';
-        });
-
-        // Mini-Stärkemeter (simpel, clientseitig)
-        pw.addEventListener('input', () => {
-            const v = pw.value;
-            let score = 0;
-            if (v.length >= 8) score++;
-            if (/[A-Z]/.test(v)) score++;
-            if (/[0-9]/.test(v)) score++;
-            if (/[^A-Za-z0-9]/.test(v)) score++;
-            pwMeter.dataset.score = String(score);
-            pwMeter.setAttribute('aria-hidden', 'false');
-        });
-
-        // Validation
+        // Helpers für Fehlermeldungen
         function setError(el, msg){
             const field = el.closest('.form-field');
             field?.classList.add('has-error');
@@ -235,20 +215,24 @@
 
         f.addEventListener('submit', (e) => {
             e.preventDefault();
-            success.classList.add('hide');
+            if (success) success.classList.add('hide');
 
-            // HTML5 validity + eigene Checks
             let ok = true;
+            const p1 = f.elements['password'];
+            const p2 = f.elements['password2'];
+
+            // Grundchecks
             Array.from(f.elements).forEach(el => {
                 if (!(el instanceof HTMLInputElement || el instanceof HTMLSelectElement)) return;
                 clearError(el);
+
                 if (el.hasAttribute('required') && !el.value.trim()){
                     setError(el, 'Pflichtfeld.');
                     ok = false;
                 } else if (el.id === 'email' && el.value && !/^\S+@\S+\.\S+$/.test(el.value)){
                     setError(el, 'Ungültige E-Mail.');
                     ok = false;
-                } else if (el.id === 'password' && el.value.length < 8){
+                } else if ((el.id === 'password' || el.id === 'password2') && el.value.length < 8){
                     setError(el, 'Mindestens 8 Zeichen.');
                     ok = false;
                 } else if (el.id === 'phone' && el.value && !el.checkValidity()){
@@ -257,20 +241,22 @@
                 }
             });
 
-            if (!document.getElementById('acceptTos').checked) {
-                setError(document.getElementById('acceptTos'), 'Erforderlich.');
+            // Passwort-Gleichheit
+            if (p1 && p2 && p1.value && p2.value && p1.value !== p2.value){
+                setError(p2, 'Passwörter stimmen nicht überein.');
                 ok = false;
             }
-            if (!document.getElementById('acceptPrivacy').checked) {
-                setError(document.getElementById('acceptPrivacy'), 'Erforderlich.');
-                ok = false;
-            }
+
+            // AGB/Datenschutz (falls vorhanden)
+            const tos = document.getElementById('acceptTos');
+            const priv = document.getElementById('acceptPrivacy');
+            if (tos && !tos.checked){ setError(tos, 'Erforderlich.'); ok = false; }
+            if (priv && !priv.checked){ setError(priv, 'Erforderlich.'); ok = false; }
 
             if (!ok) return;
 
-            // Hier würdest du per fetch() an dein Backend posten.
-            // Demo: Erfolgsmeldung anzeigen.
-            success.classList.remove('hide');
+            // Demo-Erfolg (hier sonst fetch() ans Backend)
+            if (success) success.classList.remove('hide');
             f.scrollIntoView({behavior: 'smooth', block: 'start'});
         });
     })();
