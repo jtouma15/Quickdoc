@@ -168,7 +168,7 @@ const insSlot = db.prepare(`
 
 const now = new Date();
 for (const dId of doctorIds) {
-  for (let dayOffset = 0; dayOffset < 14; dayOffset++) {
+  for (let dayOffset = 0; dayOffset <= 31; dayOffset++) {
     const day = new Date(now);
     day.setDate(day.getDate() + dayOffset);
     // weekdays only (Mon–Fri)

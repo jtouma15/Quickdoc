@@ -106,7 +106,7 @@ function renderSlotsGrid(slots){
       const dur = s.duration_min || s.duration_minutes || s.duration || 20;
       const t = fmtTime(s._startDate);
       const disabled = s.is_booked || s.booked || s.unavailable ? 'disabled' : '';
-      html += `<button class="slot" data-slot-id="${s.id}" ${disabled}>${t} (${dur}m)</button>`;
+      html += `<button class="slot" data-slot-id="${s.id}" data-start="${s._startDate.toISOString()}" data-duration="${dur}" ${disabled}>${t} (${dur}m)</button>`;
     }
     html += `</div></div>`;
   }
@@ -301,6 +301,9 @@ async function renderDoctors(){
                 }
                 if (btnSlot.disabled) return;
                 const id = btnSlot.dataset.slotId;
+                const startIso = btnSlot.dataset.start;
+                const durationMin = Number(btnSlot.dataset.duration) || 20;
+                const doctorName = `Dr. ${d.first_name} ${d.last_name}`;
                 const ok = confirm(`Diesen Termin buchen?\n${btnSlot.textContent}`);
                 if (!ok) return;
                 const r = await fetch(`${API}/book`, {
@@ -309,12 +312,14 @@ async function renderDoctors(){
                   body: JSON.stringify({ slot_id: id })
                 });
                 if (r.ok){
-                  btnSlot.disabled = true;
-                  alert("Gebucht (Demo)!");
-                  const next = await getJSON(`${API}/doctors/${d.id}/nextSlot`);
-                  $card.querySelector(".doctor__next").textContent = next
-                    ? `Nächster freier Termin: ${formatDate(next.start_time)}`
-                    : "Kein freier Termin in den nächsten 14 Tagen";
+                  sessionStorage.setItem("qd_last_booking", JSON.stringify({
+                    doctorId: d.id,
+                    doctorName,
+                    startTime: startIso,
+                    durationMin
+                  }));
+                  location.href = "/booking.html";
+                  return;
                 } else {
                   let errMsg = "Unbekannter Fehler";
                   try { const { error } = await r.json(); if (error) errMsg = error; } catch {}

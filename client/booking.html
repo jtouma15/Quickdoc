@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>QuickDoc – Buchung erfolgreich</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="container header-with-login">
+    <a href="/"><img src="/logo.png" alt="QuickDoc Logo" class="logo"></a>
+    <div>
+      <h1>Buchung abgeschlossen</h1>
+      <p>Ihr Termin wurde erfolgreich gebucht.</p>
+    </div>
+    <div class="header-right">
+      <a href="/home.html" id="loginIconLink" class="login-text" title="Login">Logout</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card" id="successCard">
+      <h2>Vielen Dank!</h2>
+      <p id="successText">Ihr Termin ist bestätigt.</p>
+      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <a class="btn btn-primary" href="/index.html">Weitere Termine suchen</a>
+        <a class="btn btn-outline" href="/home.html">Zur Startseite</a>
+        <a class="btn btn-outline" id="downloadIcs" href="#" style="display:none;">In Kalender speichern (.ics)</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <span class="site-footer__brand">© <span id="year"></span> QuickDoc</span>
+      <nav class="site-footer__nav">
+        <a href="/impressum.html">Impressum</a>
+        <a href="#" id="openPrivacy">Datenschutz</a>
+        <a href="mailto:contact@quickdoc.example">Kontakt</a>
+      </nav>
+    </div>
+  </footer>
+
+  <dialog id="privacyDialog" class="legal-dialog">
+    <form method="dialog">
+      <h2>Datenschutzerklärung</h2>
+      <p>Dies ist eine Demo-Anwendung. Es werden keine personenbezogenen Daten dauerhaft gespeichert.</p>
+      <div class="dialog-actions">
+        <button class="btn btn-outline">Schließen</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+  (function(){
+    // Footer Jahr & Datenschutz
+    const y=document.getElementById('year'); if(y) y.textContent=new Date().getFullYear();
+    const prv=document.getElementById('openPrivacy'); const dlg=document.getElementById('privacyDialog');
+    prv?.addEventListener('click',e=>{e.preventDefault(); dlg?.showModal();});
+
+    // Buchungsinfos anzeigen
+    const raw = sessionStorage.getItem('qd_last_booking');
+    const icsBtn = document.getElementById('downloadIcs');
+    try{
+      if(raw){
+        const info = JSON.parse(raw);
+        const dt = info.startTime ? new Date(info.startTime) : null;
+        const durationMin = Number(info.durationMin) || 20;
+        const dateStr = dt ? dt.toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}) : '—';
+        const timeStr = dt ? dt.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) : '';
+        const docStr  = info.doctorName || 'Ihre Praxis';
+        const durStr  = info.durationMin ? `${info.durationMin} Minuten` : '';
+        const msg = `Ihr Termin bei <strong>${docStr}</strong> am <strong>${dateStr}</strong> um <strong>${timeStr}</strong>${durStr ? ` (Dauer: ${durStr})` : ''} wurde erfolgreich gebucht.`;
+        document.getElementById('successText').innerHTML = msg;
+
+        if (icsBtn && dt instanceof Date && !Number.isNaN(dt.valueOf())) {
+          const fmtIcs = (date) => {
+            const iso = date.toISOString();
+            return iso.replace(/[-:]/g, '').split('.')[0] + 'Z';
+          };
+          const escapeIcs = (text = "") =>
+            String(text).replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
+
+          const end = new Date(dt.getTime() + durationMin * 60000);
+          const lines = [
+            "BEGIN:VCALENDAR",
+            "VERSION:2.0",
+            "PRODID:-//QuickDoc//DE",
+            "CALSCALE:GREGORIAN",
+            "BEGIN:VEVENT",
+            `UID:quickdoc-${info.doctorId || "appointment"}-${fmtIcs(dt)}`,
+            `DTSTAMP:${fmtIcs(new Date())}`,
+            `DTSTART:${fmtIcs(dt)}`,
+            `DTEND:${fmtIcs(end)}`,
+            `SUMMARY:${escapeIcs(`Termin bei ${docStr}`)}`,
+            `DESCRIPTION:${escapeIcs("Gebucht über QuickDoc")}`,
+            "END:VEVENT",
+            "END:VCALENDAR"
+          ];
+          const icsData = lines.join("\r\n");
+          icsBtn.href = `data:text/calendar;charset=utf-8,${encodeURIComponent(icsData)}`;
+          icsBtn.download = "quickdoc-termin.ics";
+          icsBtn.style.display = "inline-flex";
+        } else if (icsBtn) {
+          icsBtn.style.display = "none";
+        }
+      } else if (icsBtn) {
+        icsBtn.style.display = "none";
+      }
+    }catch(_){
+      if (icsBtn) icsBtn.style.display = "none";
+    } // falls nichts im Storage ist → Standardtext
+  })();
+  </script>
+</body>
+</html>

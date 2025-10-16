@@ -32,11 +32,6 @@ app.use(express.static(path.resolve(__dirname, "../client"), { index: false }));
 // Helpers
 const nowIso = () => new Date().toISOString();
 
-const requireAuth = (req, res, next) => {
-  if (!req.session.user) return res.status(401).json({ error: "unauthorized" });
-  next();
-};
-
 // --- AUTH API ---
 app.post("/api/register", async (req, res) => {
   const { email, password } = req.body || {};
@@ -146,7 +141,7 @@ app.get("/api/slots", (req, res) => {
   res.json(rows);
 });
 
-app.post("/api/book", requireAuth, (req, res) => {
+app.post("/api/book", (req, res) => {
   const { slot_id } = req.body;
   if (!slot_id) return res.status(400).json({ error: "slot_id is required" });
   const slot = db.prepare(`SELECT id, is_booked FROM appointment_slots WHERE id = ?`).get(Number(slot_id));

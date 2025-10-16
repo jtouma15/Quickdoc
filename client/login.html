@@ -6,29 +6,38 @@
   <title>Login – QuickDoc</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
-<body>
-  <header class="container">
-    <a href="/"><img src="/logo.png" alt="QuickDoc Logo" class="logo"></a>
-    <div>
-      <h1>Login</h1>
-      <p>Melde dich an oder registriere dich, um Termine zu buchen.</p>
+<body class="auth-page">
+  <header class="auth-header">
+    <div class="header-right">
+        <a href="/home.html" class="login-text" title="Login">Zurück zur Startseite</a>
+    </div>
+    <div class="container auth-header__inner">
+      <a href="/" class="auth-header__brand"><img src="/logo.png" alt="QuickDoc Logo" class="logo"></a>
+      <div class="auth-header__copy">
+        
+        <h1>Login</h1>
+        <p>Melde dich an oder registriere dich, um Termine zu buchen.</p>
+      </div>
+      
     </div>
   </header>
 
-  <main class="container">
-    <form id="loginForm" class="card" style="display:grid; gap:12px; max-width:520px;">
-      <label>E-Mail
-        <input id="loginEmail" type="email" placeholder="you@example.com" required>
-      </label>
-      <label>Passwort
-        <input id="loginPassword" type="password" placeholder="••••••••" required>
-      </label>
-      <div style="display:flex; gap:10px; justify-content:flex-end;">
-        <button class="btn btn-outline" type="button" id="toRegister">Registrieren</button>
-        <button class="btn btn-primary" type="submit" id="loginBtn">Login</button>
-      </div>
-      <div id="loginMsg" class="muted"></div>
-    </form>
+  <main class="auth-main">
+    <div class="container auth-main__inner">
+      <form id="loginForm" class="card auth-card">
+        <label>E-Mail
+          <input id="loginEmail" type="email" placeholder="you@example.com" required>
+        </label>
+        <label>Passwort
+          <input id="loginPassword" type="password" placeholder="••••••••" required>
+        </label>
+        <div class="auth-card__actions">
+          <button class="btn btn-outline" type="button" id="toRegister">Registrieren</button>
+          <button class="btn btn-primary" type="submit" id="loginBtn">Login</button>
+        </div>
+        <div id="loginMsg" class="muted"></div>
+      </form>
+    </div>
   </main>
 
   <footer class="site-footer">

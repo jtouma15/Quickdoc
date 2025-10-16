@@ -7,15 +7,24 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <header class="container header-with-login">
-    <a href="/"><img src="/logo.png" alt="QuickDoc Logo" class="logo"></a>
-    <div>
-      <h1>QuickDoc <small>– Arzttermine schneller finden</small></h1>
-      <p>Die einfache Termin-Suche bei Fachärzt:innen in deiner Stadt.</p>
-    </div>
-    <div class="header-right">
-           <a href="/login.html" id="loginButton" class="login-text" title="Login">Login</a>
-           <a href="/arztlogin.html" id="arztLoginButton" class="login-text" title="Arzt Login">Sie sind selbst Arzt?</a>
+  <header class="site-hero">
+    <div class="container site-hero__inner">
+      <a href="/" class="site-hero__brand">
+        <img src="/logo.png" alt="QuickDoc Logo" class="site-hero__logo">
+        <div class="site-hero__identity">
+          <strong class="site-hero__wordmark">QuickDoc</strong>
+          <span class="site-hero__descriptor">Termin-Service für deine Stadt.</span>
+        </div>
+      </a>
+      <nav class="site-hero__nav" aria-label="Hauptnavigation">
+        <a href="/suche">Termin finden</a>
+        <a href="#how">So funktioniert’s</a>
+        <a href="/booking.html">Favoriten</a>
+      </nav>
+      <div class="site-hero__actions">
+        <a href="/arztlogin.html" id="arztLoginButton" class="site-hero__action" title="Arzt Login">Sie sind Ärztin oder Arzt?</a>
+        <a href="/login.html" id="loginButton" class="site-hero__action" title="Login">Login</a>
+      </div>
     </div>
   </header>
 
