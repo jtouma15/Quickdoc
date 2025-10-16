@@ -189,15 +189,19 @@
         const employerGroup = document.getElementById('employerGroup');
         const success = document.getElementById('formSuccess');
 
-        // Employment toggle
-        f.querySelectorAll('input[name="employment"]').forEach(r => {
-            r.addEventListener('change', () => {
-                const isEmp = f.elements['employment'].value === 'employed';
+
+        // Employment toggle via Dropdown
+        const employmentSelect = f.elements['employment'];
+        if (employmentSelect) {
+            const toggleEmployer = () => {
+                const isEmp = employmentSelect.value === 'employed';
                 if (employerGroup) employerGroup.classList.toggle('hide', !isEmp);
                 const empInput = f.elements['employer'];
                 if (empInput) empInput.toggleAttribute('required', isEmp);
-            });
-        });
+            };
+            employmentSelect.addEventListener('change', toggleEmployer);
+            toggleEmployer(); // initialer Zustand
+        }
 
         // Helpers für Fehlermeldungen
         function setError(el, msg){
@@ -256,8 +260,7 @@
             if (!ok) return;
 
             // Demo-Erfolg (hier sonst fetch() ans Backend)
-            if (success) success.classList.remove('hide');
-            f.scrollIntoView({behavior: 'smooth', block: 'start'});
+            window.location.href = "success.html";
         });
     })();
 </script>
