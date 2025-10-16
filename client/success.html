@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QuickDoc – Registrierung erfolgreich</title>
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<header class="container header-with-login">
+    <a href="/"><img src="/logo.png" alt="QuickDoc Logo" class="logo"></a>
+    <div>
+        <h1>QuickDoc <small>– Arzttermine schneller finden</small></h1>
+    </div>
+    <div class="header-right">
+        <a href="/login.html" class="login-text" title="Login">Login</a>
+    </div>
+</header>
+
+<main class="container">
+    <section class="card" style="max-width: 720px; margin: 2rem auto; text-align:center; padding: 28px;">
+        <h2> Registrierung erfolgreich</h2>
+        <p class="muted" style="margin-top:0">Bitte bestätigen Sie Ihre E-Mail-Adresse, um Ihr Konto zu aktivieren.</p>
+
+        <div style="margin-top: 18px;">
+            <a class="btn btn-primary" href="/index.html">Zur Startseite</a>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="container site-footer__inner">
+        <span class="site-footer__brand">© <span id="year"></span> QuickDoc</span>
+        <nav class="site-footer__nav">
+            <a href="/suche">Termin finden</a>
+            <a href="/impressum.html">Impressum</a>
+            <a href="/img/Datenschutz%2B.pdf" target="_blank" rel="noopener">Datenschutz</a>
+            <a href="mailto:contact@quickdoc.example">Kontakt</a>
+        </nav>
+    </div>
+</footer>
+
+<script>
+    const y=document.getElementById('year'); if (y) y.textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
