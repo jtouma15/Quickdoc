@@ -25,6 +25,7 @@ body{
               radial-gradient(1000px 700px at 100% 0%, #D9FFF6 0%, transparent 55%),
               var(--brand-bg);
   line-height: 1.45;
+  animation: qd-fade-in .25s ease-out;
 }
 
 /* Layout helpers */
@@ -232,13 +233,6 @@ label{ display:flex; flex-direction:column; gap:6px; font-size:14px; color:var(-
 input, select{ padding:10px 12px; border:1px solid var(--stroke); border-radius:12px; font-size:16px; outline:none; background:#fff; color:var(--ink); transition: box-shadow .2s ease, border-color .2s ease; }
 input:focus, select:focus{ box-shadow:0 0 0 4px rgba(17,163,158,.12); border-color: var(--brand); }
 
-/* Buttons */
-button.btn{ padding:10px 14px; border-radius:12px; border:1px solid transparent; background:var(--brand); color:#fff; cursor:pointer; font-weight:700; box-shadow:0 6px 20px rgba(17,163,158,.25); transition: transform .04s ease, background-color .2s ease, box-shadow .2s ease; }
-button.btn:hover{ background: var(--brand-2); }
-button.btn:active{ transform: translateY(1px); }
-.btn-outline{ background:#ffffff00; color:var(--brand); border-color: var(--brand); }
-.btn-outline:hover{ background: rgba(17,163,158,.08); }
-
 /* Results / Doctor cards */
 #results{ display:grid; gap:16px; margin-bottom: 64px; }
 .doctor{ display:grid; gap:10px; }
@@ -313,7 +307,6 @@ button.btn:active{ transform: translateY(1px); }
 /* Delightful, but respectful motion */
 @keyframes qd-fade-in { from { opacity:0 } to { opacity:1 } }
 @keyframes qd-slide-up { from { opacity:.0; transform: translateY(10px) } to { opacity:1; transform: translateY(0) } }
-body { animation: qd-fade-in .25s ease-out; }
 #results > .card { animation: qd-slide-up .32s ease both; }
 #results > .card:nth-child(2){ animation-delay:.05s }
 #results > .card:nth-child(3){ animation-delay:.08s }
@@ -360,6 +353,7 @@ a:hover { text-decoration: underline; text-decoration-color: currentColor; }
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,.12);
   object-fit: cover;
+  animation: qd-fade-in .35s ease, heroFloat 5.2s ease-in-out infinite alternate;
 }
 @keyframes heroFloat { from { transform: translateY(0)} to { transform: translateY(-6px)} }
 
@@ -427,7 +421,7 @@ a:hover { text-decoration: underline; text-decoration-color: currentColor; }
 .testi__role { color: var(--muted); font-size: .95em; }
 .testi__stars { color: var(--brand-2); letter-spacing: 1px; }
 
-.features .card { transition: transform .18s ease, box-shadow .18s ease; }
+.features .card { transition: transform .18s ease, box-shadow .18s ease; animation: qd-slide-up .28s ease both; }
 .features .card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(12,126,121,.18); }
 .feature__img { transition: transform .35s ease; }
 .feature:hover .feature__img { transform: scale(1.05); }
@@ -444,13 +438,10 @@ a:hover { text-decoration: underline; text-decoration-color: currentColor; }
 
 /* === Subtle motion polish === */
 /* Staggered reveal for feature cards */
-.features .card { animation: qd-slide-up .28s ease both; }
 .features .card:nth-child(1){ animation-delay:.02s }
 .features .card:nth-child(2){ animation-delay:.06s }
 .features .card:nth-child(3){ animation-delay:.10s }
 
-/* Hero image: soft fade-in + gentle float */
-.hero__img { animation: qd-fade-in .35s ease, heroFloat 5.2s ease-in-out infinite alternate; }
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 10px; }
 .step { background: #f8fdfc; border: 1px solid var(--stroke); border-radius: 14px; padding: 16px; text-align: center; box-shadow: 0 6px 18px rgba(12,126,121,.08); transition: transform .18s ease, box-shadow .18s ease; }
 .step:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(12,126,121,.16); }
@@ -467,7 +458,7 @@ a:hover { text-decoration: underline; text-decoration-color: currentColor; }
   gap: clamp(14px, 2.5vw, 26px);
 }
 .hero__lead{ font-size: clamp(16px, 2.2vw, 18px); color: var(--text); margin: 0 0 12px; }
-.hero__bullets{ list-style:none; padding:0; margin:12px 0 14px; display:grid; gap:6px; color:var(--muted); }
+.hero.hero--split .hero__bullets{ margin:12px 0 14px; gap:6px; }
 .hero__media{ position:relative; border-radius:16px; overflow:hidden; min-height:280px; box-shadow: 0 10px 30px rgba(10,50,40,.08); }
 .hero__media img{ width:100%; height:100%; object-fit:cover; display:block; transform: scale(1.01); transition: transform .5s ease; }
 .hero__media::after{ content:""; position:absolute; inset:0; background: linear-gradient(90deg, rgba(255,255,255,.95) 0%, rgba(255,255,255,.55) 20%, rgba(255,255,255,0) 42%); pointer-events:none; }
@@ -562,6 +553,7 @@ a:hover { text-decoration: underline; text-decoration-color: currentColor; }
 
 .muted { color:#607d8b; font-size:.95rem; }
 .success { margin-top:1rem; padding:.75rem 1rem; border-radius:.5rem; background:#e8f6f2; color:#0f5132; border:1px solid #bfe9de; }
+/* Fehlerzustand */
 .error { color:#c62828; display:block; margin-top:.35rem; min-height:1.1em; }
 .has-error input, .has-error select { border-color:#c62828; }
 
@@ -575,15 +567,6 @@ a:hover { text-decoration: underline; text-decoration-color: currentColor; }
     padding-right: 2.25rem; /* Platz für unseren Pfeil */
 }
 /* dein bestehender Custom-Pfeil via .select:after bleibt – ergibt genau 1 Pfeil */
-
-/* Rechtstexte: Lesbarkeit */
-.form-field.legal .checkbox span {
-    line-height: 1.45;
-}
-.form-field.legal a {
-    text-decoration: underline;
-    text-underline-offset: 2px;
-}
 
 /* Buttons gleich groß nebeneinander */
 .form-actions--equal {
@@ -601,70 +584,28 @@ a:hover { text-decoration: underline; text-decoration-color: currentColor; }
     }
 }
 
-/* Fehlerzustand */
-.has-error input, .has-error select { border-color:#c62828; }
-.error { color:#c62828; display:block; margin-top:.35rem; min-height:1.1em; }
-/* --- Legal-Checkbox: in einer Zeile, Checkbox am Satzende (rechts) --- */
-.form-field.legal .checkbox{
-    display: flex;
-    align-items: flex-start;
-    gap: .5rem;
-    flex-direction: row-reverse;     /* Checkbox rechts, Text links */
-    justify-content: flex-end;
-    cursor: pointer;
-}
-
-.form-field.legal .checkbox input[type="checkbox"]{
-    flex-shrink: 0;
-    margin-top: .2rem;               /* optische Ausrichtung zur ersten Textzeile */
-}
-
-.form-field.legal .checkbox span{
-    flex: 1;                         /* Text darf umbrechen */
-    display: inline;
-    line-height: 1.45;
-}
-
-.form-field.legal .checkbox a{
-    text-decoration: underline;
-    text-underline-offset: 2px;
-}
-/* Legal-Layout: Text links volle Breite, Checkbox ganz rechts, Fehlermeldung darunter */
+/* Rechtstexte: zweispaltiges Grid mit unterstrichenen Links */
 .form-field.legal{
-    display: grid !important;
+    display:grid;
     grid-template-columns: 1fr auto;
-    align-items: start;
-    column-gap: 12px;
+    align-items:start;
+    column-gap:12px;
 }
 .form-field.legal .legal__text{
-    grid-column: 1;
-    line-height: 1.5;
-    display: block !important;
+    grid-column:1;
+    line-height:1.5;
 }
 .form-field.legal .legal__check{
-    grid-column: 2;
-    margin-top: .25rem;
-    flex-shrink: 0;
+    grid-column:2;
+    margin-top:.25rem;
+    justify-self:end;
+    flex-shrink:0;
 }
 .form-field.legal .error{
-    grid-column: 1 / -1;
-    margin-top: .35rem;
+    grid-column:1 / -1;
+    margin-top:.35rem;
 }
-
-/* alte Flex-Regeln sicher aushebeln */
-.form-field.legal .checkbox{ display: block !important; }
-/* === Checkbox rechts etwas nach innen ziehen === */
-
-/* Grid-Variante (Label links + <input class="legal__check"> rechts) */
-.form-field.legal{
-    padding-right: 280px !important;          /* Abstand vom rechten Kartenrand */
-}
-.form-field.legal .legal__check{
-    justify-self: end;                        /* bleibt rechts in ihrer Spalte */
-}
-
-/* Falls du irgendwo noch die "Label enthält Input"-Variante nutzt,
-   ziehen wir die absolut positionierte Box auch 24px vom Rand weg. */
-.form-field.legal .checkbox input[type="checkbox"]{
-    right: 280px !important;
+.form-field.legal a{
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }
