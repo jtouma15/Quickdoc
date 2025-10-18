@@ -110,6 +110,46 @@
     }catch(_){
       if (icsBtn) icsBtn.style.display = "none";
     } // falls nichts im Storage ist → Standardtext
+
+
+    // --- Bestätigungsmail senden ---
+    try {
+      // Patient-Mail aus dem Login-State
+      const auth = JSON.parse(localStorage.getItem('qd_auth_state') || '{}');
+
+      // Buchung nochmal sicher holen (nicht auf 'raw' aus anderem Block verlassen)
+      const rawBooking = sessionStorage.getItem('qd_last_booking');
+
+      if (auth.email && rawBooking) {
+        const info = JSON.parse(rawBooking);
+
+        // optional: ICS aus dem Button extrahieren, falls vorhanden
+        const ics = (icsBtn && icsBtn.href && icsBtn.href.startsWith('data:text/calendar'))
+          ? decodeURIComponent(icsBtn.href.split(',')[1])
+          : null;
+
+        fetch('/api/send-booking-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: auth.email,
+            booking: {
+              doctorName: info.doctorName,
+              startTime: info.startTime,
+              durationMin: info.durationMin,
+              location: info.location || 'Praxis/Online'
+            },
+            ics
+          })
+        })
+        .then(r => console.log('✅ Buchungs-E-Mail gesendet:', r.status))
+        .catch(e => console.error('❌ Fehler beim Senden der Mail:', e));
+      } else {
+        console.warn('Keine Patient-E-Mail oder keine Buchung gefunden – Mail nicht gesendet');
+      }
+    } catch (err) {
+      console.error('Fehler beim Mailversand:', err);
+    }
   })();
   </script>
 </body>

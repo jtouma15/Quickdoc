@@ -6,6 +6,21 @@ import { fileURLToPath } from "url";
 import db from "./db.js";
 import session from "express-session";
 import bcrypt from "bcryptjs";
+// .env laden und prüfen ob richtig geladen
+import 'dotenv/config';
+console.log("✅ .env geladen:", process.env.SMTP_HOST, process.env.MAIL_FROM);
+
+import nodemailer from 'nodemailer';
+
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT || 2525),
+  secure: false, // Mailtrap/Sandbox: kein SSL auf 2525
+  auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+  tls: { rejectUnauthorized: false },
+});
+
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -234,6 +249,60 @@ app.get("/*", (req, res, next) => {
   if (req.path.startsWith("/api/")) return next();
   res.sendFile(path.resolve(__dirname, "../client/index.html"));
 });
+
+
+// Buchungsbestätigung per E-Mail versenden
+app.post('/api/send-booking-email', async (req, res) => {
+  try {
+    const { to, booking, ics } = req.body || {};
+    console.log('📩 /api/send-booking-email', { to, hasBooking: !!booking, hasIcs: !!ics });
+
+    if (!to || !booking?.startTime) {
+      return res.status(400).json({ error: "Missing 'to' or 'booking.startTime'" });
+    }
+
+    const dt = new Date(booking.startTime);
+    const dateStr = dt.toLocaleDateString('de-DE', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+    const timeStr = dt.toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' });
+
+    const html = `
+      <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto;line-height:1.5">
+        <h2 style="margin:0 0 12px">Terminbestätigung</h2>
+        <p>Ihr Termin bei <strong>${booking.doctorName || 'Ihrer Praxis'}</strong>
+        am <strong>${dateStr}</strong> um <strong>${timeStr}</strong>
+        (Dauer: ${booking.durationMin || 20} Minuten) wurde gebucht.</p>
+        <p>Ort: ${booking.location || 'Praxis/Online'}</p>
+        <p style="margin-top:16px">Viele Grüße<br>QuickDoc</p>
+      </div>
+    `;
+
+    const attachments = ics ? [{ filename:'termin.ics', content: ics, contentType:'text/calendar' }] : [];
+
+    const nodemailer = await import('nodemailer');
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT || 2525),
+      secure: false,
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+      tls: { rejectUnauthorized: false },
+    });
+
+    await transporter.sendMail({
+      from: process.env.MAIL_FROM || 'QuickDoc <noreply@quickdoc.demo>',
+      to,
+      subject: 'Ihre Terminbestätigung',
+      html,
+      attachments,
+    });
+
+    console.log(`✅ Email sent to ${to}`);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('❌ Mail error:', err);
+    res.status(500).json({ error: 'Mailversand fehlgeschlagen' });
+  }
+});
+
 
 const PORT = process.env.PORT || 5173;
 app.listen(PORT, () => console.log(`API + UI running on http://localhost:${PORT}`));
