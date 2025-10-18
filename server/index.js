@@ -271,11 +271,11 @@ app.post('/api/send-booking-email', async (req, res) => {
         <br>
         <p>---------------------------------------------------------------------</p>
         <p>Ihr Termin <br>
-        bei <strong>${booking.doctorName || 'Ihrer Praxis'}</strong><br>
-        am <strong>${dateStr}</strong> <br>
+        bei <strong style="color:blue">${booking.doctorName || 'Ihrer Praxis'}</strong>,<br>
+        am <strong>${dateStr}</strong>,<br>
         um <strong>${timeStr}</strong>
         (Dauer: ${booking.durationMin || 20} Minuten) wurde erfolgreich gebucht.</p>
-        <p>Ort: ${booking.location || 'Praxis/Online'}</p>
+        <p> <strong>Ort:</strong> ${booking.location || 'Praxis/Online'}</p>
         <p>Bitte erscheinen Sie pünktlich zum Termin! <br>
         Falls dies nicht möglich ist, bitten wir um rechtzeitige Absage.</p><br>
         <p>Bei Fragen stehen wir Ihnen jederzeit zur Verfügung.</p>
