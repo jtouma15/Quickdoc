@@ -7,18 +7,22 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body class="auth-page">
-  <header class="auth-header">
-    <div class="header-right">
-        <a href="/home.html" class="login-text" title="Login">Zurück zur Startseite</a>
-    </div>
-    <div class="container auth-header__inner">
-      <a href="/" class="auth-header__brand"><img src="/logo.png" alt="QuickDoc Logo" class="logo"></a>
-      <div class="auth-header__copy">
-        
-        <h1>Login</h1>
-        <p>Melde dich an oder registriere dich, um Termine zu buchen.</p>
+  <header class="site-hero">
+    <div class="container site-hero__inner">
+      <a href="/" class="site-hero__brand">
+        <img src="/logo.png" alt="QuickDoc Logo" class="site-hero__logo">
+        <div class="site-hero__identity">
+          <strong class="site-hero__wordmark">QuickDoc</strong>
+          <span class="site-hero__descriptor">Login für Patient:innen</span>
+        </div>
+      </a>
+      <nav class="site-hero__nav" aria-label="Hauptnavigation">
+      </nav>
+      <div class="site-hero__actions">
+        <a href="/home.html" class="site-hero__action" title="Startseite">Zur Startseite</a>
+        <a href="/arztlogin.html" class="site-hero__action" title="Praxis registrieren">Praxis registrieren</a>
       </div>
-      
+      <p class="site-hero__tagline">Melde dich an oder registriere dich, um Termine zu buchen.</p>
     </div>
   </header>
 
