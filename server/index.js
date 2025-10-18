@@ -268,11 +268,20 @@ app.post('/api/send-booking-email', async (req, res) => {
     const html = `
       <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto;line-height:1.5">
         <h2 style="margin:0 0 12px">Terminbestätigung</h2>
-        <p>Ihr Termin bei <strong>${booking.doctorName || 'Ihrer Praxis'}</strong>
-        am <strong>${dateStr}</strong> um <strong>${timeStr}</strong>
-        (Dauer: ${booking.durationMin || 20} Minuten) wurde gebucht.</p>
+        <br>
+        <p>---------------------------------------------------------------------</p>
+        <p>Ihr Termin <br>
+        bei <strong>${booking.doctorName || 'Ihrer Praxis'}</strong><br>
+        am <strong>${dateStr}</strong> <br>
+        um <strong>${timeStr}</strong>
+        (Dauer: ${booking.durationMin || 20} Minuten) wurde erfolgreich gebucht.</p>
         <p>Ort: ${booking.location || 'Praxis/Online'}</p>
-        <p style="margin-top:16px">Viele Grüße<br>QuickDoc</p>
+        <p>Bitte erscheinen Sie pünktlich zum Termin! <br>
+        Falls dies nicht möglich ist, bitten wir um rechtzeitige Absage.</p><br>
+        <p>Bei Fragen stehen wir Ihnen jederzeit zur Verfügung.</p>
+        <br>
+        <p>---------------------------------------------------------------------</p>
+        <p style="margin-top:16px">Viele Grüße<br> Ihr QuickDoc Team</p>
       </div>
     `;
 
