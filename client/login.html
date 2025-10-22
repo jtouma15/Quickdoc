@@ -19,6 +19,7 @@
       <nav class="site-hero__nav" aria-label="Hauptnavigation">
       </nav>
       <div class="site-hero__actions">
+        <span class="site-hero__action user-badge hidden" data-user-firstname hidden></span>
         <a href="/home.html" class="site-hero__action" title="Startseite">Zur Startseite</a>
         <a href="/arztlogin.html" class="site-hero__action" title="Praxis registrieren">Praxis registrieren</a>
       </div>
@@ -36,7 +37,7 @@
           <input id="loginPassword" type="password" placeholder="••••••••" required>
         </label>
         <div class="auth-card__actions">
-          <button class="btn btn-outline" type="button" id="toRegister">Registrieren</button>
+          <button class="btn btn-outline" type="button" id="toRegister">Jetzt registrieren</button>
           <button class="btn btn-primary" type="submit" id="loginBtn">Login</button>
         </div>
         <div id="loginMsg" class="muted"></div>
@@ -63,6 +64,7 @@
     </form>
   </dialog>
 
+  <script src="./auth-state.js"></script>
   <script src="./app.js"></script>
 
   <script>
@@ -73,16 +75,11 @@
       if (prv && dlg) prv.addEventListener('click', e=>{ e.preventDefault(); dlg.showModal(); });
 
       // Enter auf Passwort triggert Submit automatisch, da es ein echtes <form> ist
-      const email = document.getElementById('loginEmail');
       const toReg = document.getElementById('toRegister');
 
-      // Simulierte Registrierung: direkt einloggen und weiter zur Suche
       toReg?.addEventListener('click', (e)=>{
         e.preventDefault();
-        const em = (email?.value || 'user@example.com').trim();
-        localStorage.setItem('qd_auth_state', JSON.stringify({ loggedIn:true, email: em }));
-        alert('Registrierung erfolgreich (Demo)');
-        location.href = '/suche';
+        location.href = '/register.html';
       });
     })();
   </script>

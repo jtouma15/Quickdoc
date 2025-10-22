@@ -19,8 +19,10 @@
         <nav class="site-hero__nav" aria-label="Hauptnavigation">
         </nav>
         <div class="site-hero__actions">
+            <span class="site-hero__action user-badge hidden" data-user-firstname hidden></span>
             <a href="/home.html" class="site-hero__action" title="Startseite">Zur Startseite</a>
             <a href="/index.html" class="site-hero__action" title="Termin finden">Termin finden</a>
+        </div>
 </header>
 
 <main class="container">
@@ -46,6 +48,7 @@
     </div>
 </footer>
 
+<script src="./auth-state.js"></script>
 <script>
     const y=document.getElementById('year'); if (y) y.textContent=new Date().getFullYear();
 </script>

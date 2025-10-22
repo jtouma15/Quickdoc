@@ -14,7 +14,8 @@
       <p>Ihr Termin wurde erfolgreich gebucht.</p>
     </div>
     <div class="header-right">
-      <a href="/home.html" id="loginIconLink" class="login-text" title="Login">Logout</a>
+      <span class="user-badge hidden" data-user-firstname hidden></span>
+      <a href="/login.html" id="loginIconLink" class="login-text" title="Login">Login</a>
     </div>
   </header>
 
@@ -51,6 +52,7 @@
     </form>
   </dialog>
 
+  <script src="./auth-state.js"></script>
   <script>
   (function(){
     // Footer Jahr & Datenschutz
@@ -115,7 +117,7 @@
     // --- Bestätigungsmail senden ---
     try {
       // Patient-Mail aus dem Login-State
-      const auth = JSON.parse(localStorage.getItem('qd_auth_state') || '{}');
+      const auth = window.qdAuth ? window.qdAuth.getAuth() : JSON.parse(localStorage.getItem('qd_auth_state') || '{}');
 
       // Buchung nochmal sicher holen (nicht auf 'raw' aus anderem Block verlassen)
       const rawBooking = sessionStorage.getItem('qd_last_booking');

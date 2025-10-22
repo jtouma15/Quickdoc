@@ -119,6 +119,22 @@ small{ color:var(--muted); font-weight:400; }
 .site-hero__action:active{
   transform: translateY(0);
 }
+.user-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  color: var(--brand-2);
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(17,163,158,.26);
+  background: rgba(17,163,158,.12);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.52), 0 4px 12px rgba(12,126,121,.08);
+  cursor: default;
+}
+.header-right .user-badge{
+  padding: 8px 16px;
+}
 .site-hero__tagline{
   grid-column: 1 / -1;
   margin: 0;

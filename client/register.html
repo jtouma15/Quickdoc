@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registrierung – QuickDoc</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="auth-page">
+  <header class="site-hero">
+    <div class="container site-hero__inner">
+      <a href="/" class="site-hero__brand">
+        <img src="/logo.png" alt="QuickDoc Logo" class="site-hero__logo" />
+        <div class="site-hero__identity">
+          <strong class="site-hero__wordmark">QuickDoc</strong>
+          <span class="site-hero__descriptor">Registrierung für Patient:innen</span>
+        </div>
+      </a>
+      <nav class="site-hero__nav" aria-label="Hauptnavigation">
+        <a href="/index.html">Termin finden</a>
+        <a href="/home.html">Übersicht</a>
+      </nav>
+      <div class="site-hero__actions">
+        <span class="site-hero__action user-badge hidden" data-user-firstname hidden></span>
+        <a href="/login.html" class="site-hero__action" title="Zurück zum Login">Zurück zum Login</a>
+      </div>
+      <p class="site-hero__tagline">Erstelle dein QuickDoc-Konto und buche Termine in wenigen Klicks.</p>
+    </div>
+  </header>
+
+  <main class="auth-main">
+    <div class="container auth-main__inner">
+      <form id="registerForm" class="card auth-card" novalidate>
+        <h1 style="margin:0;">Jetzt registrieren</h1>
+        <p class="muted" style="margin-top:-4px;">Kostenloses Demo-Konto für Patient:innen.</p>
+
+        <div style="display:grid; gap:12px;">
+          <label>Vorname
+            <input id="regFirstname" type="text" name="firstname" placeholder="Alex" required />
+          </label>
+          <label>Nachname
+            <input id="regLastname" type="text" name="lastname" placeholder="Muster" required />
+          </label>
+          <label>E-Mail
+            <input id="regEmail" type="email" name="email" placeholder="you@example.com" required />
+          </label>
+          <label>Passwort
+            <input id="regPassword" type="password" name="password" placeholder="Mindestens 6 Zeichen" minlength="6" required />
+          </label>
+          <label>Passwort bestätigen
+            <input id="regPasswordConfirm" type="password" name="passwordConfirm" placeholder="Passwort wiederholen" minlength="6" required />
+          </label>
+          <label style="display:flex; gap:10px; align-items:flex-start;">
+            <input id="regPrivacy" type="checkbox" required style="margin-top:4px;" />
+            <span>Ich stimme der <a href="/impressum.html">Datenschutzerklärung</a> von QuickDoc zu.</span>
+          </label>
+        </div>
+
+        <div class="auth-card__actions">
+          <a class="btn btn-outline" href="/login.html">Zurück</a>
+          <button class="btn btn-primary" type="submit">Konto erstellen</button>
+        </div>
+        <div id="registerMsg" class="muted" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <span class="site-footer__brand">© <span id="year"></span> QuickDoc</span>
+      <nav class="site-footer__nav">
+        <a href="/impressum.html">Impressum</a>
+        <a href="#" id="openPrivacy">Datenschutz</a>
+        <a href="mailto:contact@quickdoc.example">Kontakt</a>
+      </nav>
+    </div>
+  </footer>
+
+  <dialog id="privacyDialog" class="legal-dialog">
+    <form method="dialog">
+      <h2>Datenschutzerklärung</h2>
+      <p>Dies ist eine Demo-Anwendung. Es werden keine personenbezogenen Daten dauerhaft gespeichert.</p>
+      <div class="dialog-actions">
+        <button class="btn btn-outline">Schließen</button>
+      </div>
+    </form>
+  </dialog>
+  <script src="./auth-state.js"></script>
+  <script>
+    (function(){
+      const form = document.getElementById('registerForm');
+      const msg = document.getElementById('registerMsg');
+
+      const year = document.getElementById('year');
+      if (year) year.textContent = new Date().getFullYear();
+
+      const privacyTrigger = document.getElementById('openPrivacy');
+      const privacyDialog = document.getElementById('privacyDialog');
+      if (privacyTrigger && privacyDialog) {
+        privacyTrigger.addEventListener('click', (event) => {
+          event.preventDefault();
+          privacyDialog.showModal();
+        });
+      }
+
+      form?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        msg.textContent = '';
+
+        const firstname = document.getElementById('regFirstname')?.value.trim();
+        const lastname = document.getElementById('regLastname')?.value.trim();
+        const email = document.getElementById('regEmail')?.value.trim();
+        const password = document.getElementById('regPassword')?.value;
+        const confirm = document.getElementById('regPasswordConfirm')?.value;
+        const accepted = document.getElementById('regPrivacy')?.checked;
+
+        if (!firstname || !lastname) {
+          msg.textContent = 'Bitte gib deinen Vor- und Nachnamen ein.';
+          return;
+        }
+        if (!email) {
+          msg.textContent = 'Bitte gib eine gültige E-Mail-Adresse ein.';
+          return;
+        }
+        if (!password || password.length < 6) {
+          msg.textContent = 'Das Passwort muss mindestens 6 Zeichen haben.';
+          return;
+        }
+        if (password !== confirm) {
+          msg.textContent = 'Die Passwörter stimmen nicht überein.';
+          return;
+        }
+        if (!accepted) {
+          msg.textContent = 'Bitte bestätige die Datenschutzbestimmungen.';
+          return;
+        }
+
+        const auth = {
+          loggedIn: true,
+          email,
+          name: `${firstname} ${lastname}`
+        };
+
+        if (window.qdAuth){
+          window.qdAuth.setAuth(auth);
+          window.qdAuth.rememberProfile(email, { email, name: `${firstname} ${lastname}` });
+        } else {
+          localStorage.setItem('qd_auth_state', JSON.stringify(auth));
+        }
+
+        sessionStorage.setItem('qd_onboarding_hint', firstname);
+        window.location.href = '/index.html';
+      });
+    })();
+  </script>
+</body>
+</html>

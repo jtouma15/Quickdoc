@@ -18,6 +18,7 @@
       <nav class="site-hero__nav" aria-label="Hauptnavigation">
       </nav>
       <div class="site-hero__actions">
+        <span class="site-hero__action user-badge hidden" data-user-firstname hidden></span>
         <a href="/arztlogin.html" id="arztLoginButton" class="site-hero__action" title="Arzt Login">Sie sind Ärztin oder Arzt?</a>
         <a href="/login.html" id="loginButton" class="site-hero__action" title="Login">Login</a>
       </div>
@@ -139,6 +140,7 @@
       if (prv && dlg) prv.addEventListener('click', e=>{ e.preventDefault(); dlg.showModal(); });
     })();
   </script>
+  <script src="./auth-state.js"></script>
 <script>
   // Mini-Slider für Testimonials (autoplay + Dots)
   (function(){

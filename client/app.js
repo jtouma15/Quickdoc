@@ -353,60 +353,106 @@ async function renderDoctors(){
 
 // --- Simulierte Auth (nur Frontend) ---
 const AUTH_KEY = "qd_auth_state";
-function getAuth(){
-  try { return JSON.parse(localStorage.getItem(AUTH_KEY)) || { loggedIn:false }; }
-  catch { return { loggedIn:false }; }
-}
-function setAuth(state){ localStorage.setItem(AUTH_KEY, JSON.stringify(state)); }
-function clearAuth(){ localStorage.removeItem(AUTH_KEY); }
 
 function pickLoginEl(){
   return document.getElementById("loginLink")
       || document.getElementById("loginIconLink")
-      || document.querySelector(".site-header__login a, a[href$='login.html']");
+      || document.getElementById("loginButton")
+      || document.querySelector(".site-header__login a")
+      || document.querySelector("a[href$='login.html']");
 }
 function pickLogoutEl(){
-  return document.getElementById("logoutLink")
+  return document.querySelector("[data-qd-logout]")
+      || document.getElementById("logoutLink")
       || document.querySelector("a[data-logout]");
+}
+
+function fallbackSyncUI(){
+  const auth = fallbackAuth.getAuth();
+  const loggedIn = !!auth.loggedIn;
+  isLoggedIn = loggedIn;
+  const loginEl = pickLoginEl();
+  let logoutEl = pickLogoutEl();
+
+  if (!logoutEl && loginEl && loginEl.parentElement){
+    logoutEl = document.createElement("a");
+    logoutEl.href = "#";
+    logoutEl.textContent = "Logout";
+    logoutEl.dataset.qdLogout = "true";
+    logoutEl.className = loginEl.className || "btn btn-outline";
+    logoutEl.style.marginLeft = logoutEl.style.marginLeft || "8px";
+    loginEl.parentElement.appendChild(logoutEl);
+  }
+
+  if (loggedIn){
+    if (loginEl){
+      loginEl.classList.add("hidden");
+      loginEl.setAttribute("hidden", "");
+      loginEl.onclick = null;
+    }
+    if (logoutEl){
+      logoutEl.classList.remove("hidden");
+      logoutEl.removeAttribute("hidden");
+      logoutEl.onclick = (ev)=>{ ev.preventDefault(); fallbackAuth.clearAuth(); };
+    }
+  } else {
+    if (logoutEl){
+      logoutEl.classList.add("hidden");
+      logoutEl.setAttribute("hidden", "");
+      logoutEl.onclick = null;
+    }
+    if (loginEl){
+      loginEl.classList.remove("hidden");
+      loginEl.removeAttribute("hidden");
+      loginEl.onclick = (ev)=>{
+        if (document.getElementById("loginForm")) return;
+        ev.preventDefault();
+        fallbackAuth.setAuth({ loggedIn:true, email:"demo@quickdoc.example" });
+        alert("Eingeloggt (Demo)");
+      };
+    }
+  }
+}
+
+const fallbackAuth = {
+  getAuth(){
+    try { return JSON.parse(localStorage.getItem(AUTH_KEY)) || { loggedIn:false }; }
+    catch { return { loggedIn:false }; }
+  },
+  setAuth(state){
+    localStorage.setItem(AUTH_KEY, JSON.stringify(state));
+    fallbackSyncUI();
+  },
+  clearAuth(){
+    localStorage.removeItem(AUTH_KEY);
+    fallbackSyncUI();
+  },
+  syncUI: fallbackSyncUI
+};
+
+const authService = {
+  get: window.qdAuth?.getAuth || fallbackAuth.getAuth,
+  set: window.qdAuth?.setAuth || fallbackAuth.setAuth,
+  clear: window.qdAuth?.clearAuth || fallbackAuth.clearAuth,
+  sync: window.qdAuth?.syncUI || fallbackAuth.syncUI
+};
+
+function getAuth(){
+  return authService.get();
+}
+function setAuth(state){
+  authService.set(state);
+  isLoggedIn = !!(state && state.loggedIn);
+}
+function clearAuth(){
+  authService.clear();
+  isLoggedIn = false;
 }
 
 function updateAuthUI(){
   const auth = getAuth();
   isLoggedIn = !!auth.loggedIn;
-  const $login = pickLoginEl();
-  let $logout = pickLogoutEl();
-
-  // Falls kein expliziter Logout-Link existiert, erzeugen wir einen neben dem Login-Link
-  if (!$logout && $login && $login.parentElement){
-    $logout = document.createElement("a");
-    $logout.href = "#";
-    $logout.textContent = "Logout";
-    $logout.id = "logoutLink";
-    $logout.className = $login.className || "btn btn-outline";
-    $logout.style.marginLeft = "8px";
-    $login.parentElement.appendChild($logout);
-  }
-
-  if (isLoggedIn){
-    if ($login) $login.classList.add("hidden");
-    if ($logout){
-      $logout.classList.remove("hidden");
-      $logout.onclick = (e)=>{ e.preventDefault(); clearAuth(); updateAuthUI(); };
-    }
-  } else {
-    if ($logout) $logout.classList.add("hidden");
-    if ($login){
-      $login.classList.remove("hidden");
-      $login.onclick = (e)=>{
-        // Zu einer Login-Seite gehen, wenn vorhanden, sonst direkt simuliert einloggen
-        if (document.getElementById("loginForm")) return; // auf login.html übernimmt das Formular
-        e.preventDefault();
-        setAuth({ loggedIn:true, email:"demo@quickdoc.example" });
-        alert("Eingeloggt (Demo)");
-        updateAuthUI();
-      };
-    }
-  }
+  authService.sync();
 }
 
 // Falls eine Login-Seite mit Formular existiert, Submission abfangen und simulieren
@@ -416,7 +462,13 @@ function updateAuthUI(){
   form.addEventListener("submit", (e)=>{
     e.preventDefault();
     const email = (form.querySelector("input[type='email']") || {}).value || "user@example.com";
-    setAuth({ loggedIn:true, email });
+    const profile = window.qdAuth?.lookupProfile ? window.qdAuth.lookupProfile(email) : null;
+    const fallbackName = (email.split("@")[0] || "Patient:in").replace(/\./g, " ");
+    const name = profile?.name || fallbackName;
+    if (window.qdAuth?.rememberProfile){
+      window.qdAuth.rememberProfile(email, { email, name });
+    }
+    setAuth({ loggedIn:true, email, name });
     alert("Login erfolgreich (Demo)");
     location.href = "/index.html"; // zurück zur Suche
   });
@@ -424,19 +476,27 @@ function updateAuthUI(){
 })();
 
 // Suche-Button → auf Seite 1 springen
-$search.addEventListener("click", () => { currentPage = 1; renderDoctors(); });
+if ($search){
+  $search.addEventListener("click", () => { currentPage = 1; renderDoctors(); });
+}
 
 // Enter im Namensfeld → auf Seite 1 springen + suchen
-$name.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    currentPage = 1;
-    renderDoctors();
-  }
-});
+if ($name){
+  $name.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      currentPage = 1;
+      renderDoctors();
+    }
+  });
+}
 
 // Initialisierung
 (async function init(){
-  await loadFilters();
-  await renderDoctors();
+  if ($specialty && $city && $results && tpl){
+    await loadFilters();
+    await renderDoctors();
+  } else {
+    updateAuthUI();
+  }
 })();
