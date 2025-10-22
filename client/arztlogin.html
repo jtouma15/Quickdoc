@@ -7,15 +7,26 @@
     <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-<!-- Header wie auf Startseite -->
-<header class="container header-with-login">
-    <a href="/"><img src="/logo.png" alt="QuickDoc Logo" class="logo"></a>
-    <div>
-        <h1>QuickDoc <small>– Arzttermine schneller finden</small></h1>
-        <p>Registrieren Sie Ihre Praxis und verwalten Sie Termine online.</p>
-    </div>
-    <div class="header-right">
-        <a href="/home.html" class="login-text" title="Login">Zurück zur Startseite</a>
+<header class="site-hero">
+    <div class="container site-hero__inner">
+        <a href="/" class="site-hero__brand">
+            <img src="/logo.png" alt="QuickDoc Logo" class="site-hero__logo">
+            <div class="site-hero__identity">
+                <strong class="site-hero__wordmark">QuickDoc</strong>
+                <span class="site-hero__descriptor">Praxis-Registrierung</span>
+            </div>
+        </a>
+        <nav class="site-hero__nav" aria-label="Hauptnavigation">
+            <a href="/home.html">Start</a>
+            <a href="/index.html">Termin finden</a>
+            <a href="/impressum.html">Impressum</a>
+        </nav>
+        <div class="site-hero__actions">
+            <span class="site-hero__action user-badge hidden" data-user-firstname hidden></span>
+            <a href="/home.html" class="site-hero__action" title="Zur Startseite">Zur Startseite</a>
+            <a href="/login.html" class="site-hero__action" title="Patient:innen-Login">Patient:innen-Login</a>
+        </div>
+        <p class="site-hero__tagline">Registrieren Sie Ihre Praxis und verwalten Sie Termine online.</p>
     </div>
 </header>
 

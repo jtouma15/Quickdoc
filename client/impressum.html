@@ -7,11 +7,24 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <header class="container">
-    <a href="/"><img src="/logo.png" alt="QuickDoc Logo" class="logo"></a>
-    <div>
-      <h1>Impressum</h1>
-      <p>Angaben gemäß § 5 TMG</p>
+  <header class="site-hero">
+    <div class="container site-hero__inner">
+      <a href="/" class="site-hero__brand">
+        <img src="/logo.png" alt="QuickDoc Logo" class="site-hero__logo">
+        <div class="site-hero__identity">
+          <strong class="site-hero__wordmark">QuickDoc</strong>
+          <span class="site-hero__descriptor">Impressum</span>
+        </div>
+      </a>
+      <nav class="site-hero__nav" aria-label="Hauptnavigation">
+        <a href="/home.html">Start</a>
+        <a href="/index.html">Termin finden</a>
+      </nav>
+      <div class="site-hero__actions">
+        <span class="site-hero__action user-badge hidden" data-user-firstname hidden></span>
+        <a href="/login.html" id="loginLink" class="site-hero__action" title="Login">Login</a>
+      </div>
+      <p class="site-hero__tagline">Angaben gemäß § 5 TMG.</p>
     </div>
   </header>
 

@@ -7,18 +7,18 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <header class="container header-with-login">
-    <a href="/">
-      <img src="/logo.png" alt="QuickDoc Logo" class="logo">
-    </a>
-    <div>
-      <h1>QuickDoc</h1>
-      <p>Finde den nächstmöglichen Termin bei verschiedenen Fachärzten in deiner Stadt.</p>
-    </div>
-    <div class="header-right">
-      <span class="user-badge hidden" data-user-firstname hidden></span>
-      <a href="/login.html" id="loginIconLink" title="Login" class="login-text">Login</a>
-    </div>
+  <header class="site-hero">
+    <div class="container site-hero__inner">
+      <a href="/" class="site-hero__brand">
+        <img src="/logo.png" alt="QuickDoc Logo" class="site-hero__logo">
+        <div class="site-hero__identity">
+          <strong class="site-hero__wordmark">QuickDoc</strong>
+        </div>
+      </a>
+      
+      <div class="site-hero__actions">
+        <span class="site-hero__action user-badge hidden" data-user-firstname hidden></span>
+        <a href="/login.html" id="loginIconLink" class="site-hero__action" title="Login">Login</a>
   </header>
 
   <section class="container card">

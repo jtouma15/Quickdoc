@@ -7,16 +7,18 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <header class="container header-with-login">
-    <a href="/"><img src="/logo.png" alt="QuickDoc Logo" class="logo"></a>
-    <div>
-      <h1>Buchung abgeschlossen</h1>
-      <p>Ihr Termin wurde erfolgreich gebucht.</p>
-    </div>
-    <div class="header-right">
-      <span class="user-badge hidden" data-user-firstname hidden></span>
-      <a href="/login.html" id="loginIconLink" class="login-text" title="Login">Login</a>
-    </div>
+  <header class="site-hero">
+    <div class="container site-hero__inner">
+      <a href="/" class="site-hero__brand">
+        <img src="/logo.png" alt="QuickDoc Logo" class="site-hero__logo">
+        <div class="site-hero__identity">
+          <strong class="site-hero__wordmark">QuickDoc</strong>
+          <span class="site-hero__descriptor">Buchung abgeschlossen</span>
+        </div>
+      <div class="site-hero__actions">
+        <span class="site-hero__action user-badge hidden" data-user-firstname hidden></span>
+        <a href="/home.html" class="site-hero__action" title="Startseite">Zur Startseite</a>
+        <a href="/login.html" id="loginIconLink" class="site-hero__action" title="Login">Login</a>
   </header>
 
   <main class="container">
@@ -26,7 +28,7 @@
       <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
         <a class="btn btn-primary" href="/index.html">Weitere Termine suchen</a>
         <a class="btn btn-outline" href="/home.html">Zur Startseite</a>
-        <a class="btn btn-outline" id="downloadIcs" href="#" style="display:none;">In Kalender speichern (.ics)</a>
+        <a class="btn btn-outline" id="downloadIcs" href="#" style="display:none;">Im Kalender speichern</a>
       </div>
     </section>
   </main>
