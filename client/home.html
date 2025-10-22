@@ -92,24 +92,50 @@
   </section>
 
   <!-- Testimonials -->
-  <section class="card testi">
+  <section class="card testi" aria-labelledby="testiHeading">
     <div class="testi__header">
-      <h2>Was Nutzer sagen</h2>
-      <div class="testi__dots" id="testiDots"></div>
+      <h2 id="testiHeading">Was Nutzer sagen</h2>
+      <div class="testi__dots" id="testiDots" role="tablist" aria-label="Testimonial Navigation"></div>
     </div>
-    <div class="testi__track" id="testiTrack">
-      <figure class="testi__item">
-        <blockquote>„Innerhalb von 2 Minuten einen Termin gefunden – mega!“</blockquote>
-        <figcaption>– Sarah K.</figcaption>
-      </figure>
-      <figure class="testi__item">
-        <blockquote>„Die Filter sind super übersichtlich, spart mir Telefonate.“</blockquote>
-        <figcaption>– Jonas P.</figcaption>
-      </figure>
-      <figure class="testi__item">
-        <blockquote>„Genau mein Ding: eingeben, klicken, Termin steht.“</blockquote>
-        <figcaption>– Mira L.</figcaption>
-      </figure>
+    <div class="testi__viewport">
+      <div class="testi__track" id="testiTrack" role="list">
+        <article class="testi__slide" role="group" aria-roledescription="slide">
+          <div class="testi__grid">
+            <figure class="testi__item">
+              <blockquote>„Innerhalb von 2 Minuten einen Termin gefunden – mega!“</blockquote>
+              <figcaption>– Sarah K.</figcaption>
+            </figure>
+            <figure class="testi__item">
+              <blockquote>„Die Filter sind super übersichtlich, spart mir Telefonate.“</blockquote>
+              <figcaption>– Jonas P.</figcaption>
+            </figure>
+          </div>
+        </article>
+        <article class="testi__slide" role="group" aria-roledescription="slide">
+          <div class="testi__grid">
+            <figure class="testi__item">
+              <blockquote>„Genau mein Ding: eingeben, klicken, Termin steht.“</blockquote>
+              <figcaption>– Mira L.</figcaption>
+            </figure>
+            <figure class="testi__item">
+              <blockquote>„Ich spare pro Woche locker eine Stunde Praxis-Telefonate ein.“</blockquote>
+              <figcaption>– Daniel R.</figcaption>
+            </figure>
+          </div>
+        </article>
+        <article class="testi__slide" role="group" aria-roledescription="slide">
+          <div class="testi__grid">
+            <figure class="testi__item">
+              <blockquote>„Die Erinnerungen per Mail sind Gold wert – kein Termin mehr verpasst.“</blockquote>
+              <figcaption>– Lena S.</figcaption>
+            </figure>
+            <figure class="testi__item">
+              <blockquote>„Auch als Berufstätiger finde ich endlich Abendtermine. Absolute Empfehlung.“</blockquote>
+              <figcaption>– Maximilian B.</figcaption>
+            </figure>
+          </div>
+        </article>
+      </div>
     </div>
   </section>
 </main>
@@ -147,25 +173,76 @@
     const track = document.getElementById('testiTrack');
     const dotsC = document.getElementById('testiDots');
     if(!track || !dotsC) return;
-    const items = Array.from(track.children);
+    const items = Array.from(track.querySelectorAll('.testi__slide'));
+    if (!items.length) return;
     let i = 0;
 
-    items.forEach((_, idx) => {
+    items.forEach((slide, idx) => {
+      const slideId = slide.id || `testiSlide${idx + 1}`;
+      slide.id = slideId;
       const b = document.createElement('button');
+      b.type = 'button';
       b.className = 'dot' + (idx===0?' dot--active':'');
+      b.setAttribute('role', 'tab');
+      b.setAttribute('aria-label', `Testimonial ${idx + 1}`);
+      b.setAttribute('aria-selected', idx === 0 ? 'true' : 'false');
+      b.setAttribute('aria-controls', slideId);
+      b.tabIndex = idx === 0 ? 0 : -1;
       b.addEventListener('click', ()=> go(idx));
       dotsC.appendChild(b);
     });
 
+    const updateAria = () => {
+      items.forEach((slide, idx) => {
+        const active = idx === i;
+        slide.setAttribute('aria-hidden', active ? 'false' : 'true');
+        slide.setAttribute('tabindex', active ? '0' : '-1');
+      });
+      Array.from(dotsC.children).forEach((d, idx)=> {
+        const active = idx === i;
+        d.classList.toggle('dot--active', active);
+        d.setAttribute('aria-selected', active ? 'true' : 'false');
+        d.tabIndex = active ? 0 : -1;
+      });
+    };
+
     function go(n){
       i = (n + items.length) % items.length;
       track.style.transform = `translateX(${-i*100}%)`;
-      Array.from(dotsC.children).forEach((d, idx)=> d.classList.toggle('dot--active', idx===i));
+      updateAria();
     }
 
-    let t = setInterval(()=> go(i+1), 4000);
-    dotsC.addEventListener('mouseenter', ()=> clearInterval(t));
-    dotsC.addEventListener('mouseleave', ()=> t = setInterval(()=> go(i+1), 4000));
+    updateAria();
+    let auto = null;
+    const stopAuto = () => {
+      if (auto) {
+        clearInterval(auto);
+        auto = null;
+      }
+    };
+    const startAuto = () => {
+      stopAuto();
+      auto = setInterval(()=> go(i+1), 5000);
+    };
+
+    startAuto();
+
+    dotsC.addEventListener('mouseenter', stopAuto);
+    dotsC.addEventListener('mouseleave', startAuto);
+    dotsC.addEventListener('focusin', stopAuto);
+    dotsC.addEventListener('focusout', startAuto);
+    dotsC.addEventListener('keydown', (event) => {
+      const key = event.key;
+      if (key !== 'ArrowRight' && key !== 'ArrowLeft') return;
+      event.preventDefault();
+      const direction = key === 'ArrowRight' ? 1 : -1;
+      go(i + direction);
+      const dots = dotsC.querySelectorAll('button');
+      const activeDot = dots[i];
+      activeDot?.focus();
+    });
+    track.addEventListener('mouseenter', stopAuto);
+    track.addEventListener('mouseleave', startAuto);
   })();
 </script>
 </body>
