@@ -110,10 +110,20 @@ app.get("/api/doctors", (req, res) => {
   const where = clauses.length ? "WHERE " + clauses.join(" AND ") : "";
   const sql = `
     SELECT d.id, d.first_name, d.last_name, s.name AS specialty,
-           d.phone, d.email
+           d.phone, d.email,
+           COALESCE(json_group_array(
+             CASE WHEN l.id IS NULL THEN NULL ELSE json_object(
+               'street', l.street,
+               'city', l.city,
+               'zip', l.zip
+             ) END
+           ), '[]') AS addresses
     FROM doctors d
     JOIN specialties s ON s.id = d.specialty_id
+    LEFT JOIN doctor_locations dl ON dl.doctor_id = d.id
+    LEFT JOIN locations l ON l.id = dl.location_id
     ${where}
+    GROUP BY d.id
     ORDER BY s.name, d.last_name, d.first_name
     LIMIT 100
   `;
