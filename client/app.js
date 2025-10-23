@@ -41,6 +41,24 @@ function formatDate(iso){
   return d.toLocaleString(undefined, { weekday:"short", day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
 }
 
+function parseAddresses(raw){
+  if (!raw) return [];
+  try {
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .filter(Boolean)
+      .slice(0, 1)
+      .map(addr => ({
+        street: addr.street || "",
+        city: addr.city || "",
+        zip: addr.zip || ""
+      }));
+  } catch {
+    return [];
+  }
+}
+
 // kleine Hilfsfunktion: ein Star als SVG
 function starSVG(cls = "") {
   return `
@@ -114,6 +132,271 @@ function renderSlotsGrid(slots){
   return html;
 }
 
+function setStarSelection(buttons, selected){
+  buttons.forEach(btn => {
+    const svg = btn.querySelector(".star-svg");
+    if (!svg) return;
+    const score = Number(btn.dataset.score) || 0;
+    const isActive = score <= selected && selected > 0;
+    if (isActive){
+      svg.classList.add("star-svg--full");
+      svg.classList.remove("star-svg--empty");
+    } else {
+      svg.classList.remove("star-svg--full");
+      svg.classList.add("star-svg--empty");
+    }
+    btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+}
+
+function renderRatingComments(container, ratings){
+  if (!container) return;
+  if (!Array.isArray(ratings) || !ratings.length){
+    container.innerHTML = `<p class="rating-empty muted">Noch keine Bewertungen</p>`;
+    return;
+  }
+  container.innerHTML = "";
+  ratings.forEach(r => {
+    const item = document.createElement("article");
+    item.className = "rating-comment";
+
+    const header = document.createElement("div");
+    header.className = "rating-comment__header";
+
+    const author = document.createElement("strong");
+    author.className = "rating-comment__author";
+    const name = (r.author_name || "").toString().trim();
+    author.textContent = name || "Anonym";
+
+    const stars = document.createElement("span");
+    stars.className = "rating-comment__stars";
+    stars.innerHTML = renderStars(Number(r.score) || 0);
+
+    header.append(author, stars);
+
+    const created = r.created_at ? new Date(r.created_at) : null;
+    if (created && !Number.isNaN(created.valueOf())){
+      const time = document.createElement("time");
+      time.className = "rating-comment__time";
+      time.dateTime = created.toISOString();
+      time.textContent = created.toLocaleDateString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      });
+      header.appendChild(time);
+    }
+
+    item.appendChild(header);
+
+    if (r.comment){
+      const body = document.createElement("p");
+      body.className = "rating-comment__text";
+      body.textContent = r.comment;
+      item.appendChild(body);
+    }
+
+    container.appendChild(item);
+  });
+}
+
+async function loadDoctorRatings(doctorId, refs){
+  const { starsSpan, countSpan, comments } = refs;
+  if (comments){
+    comments.innerHTML = `<p class="rating-empty muted">Bewertungen werden geladen …</p>`;
+  }
+  try{
+    const data = await getJSON(`${API}/doctors/${doctorId}/ratings`);
+    const avg = Number(data.avg_rating) || 0;
+    const count = Number(data.rating_count) || 0;
+    if (starsSpan) starsSpan.innerHTML = renderStars(avg);
+    if (countSpan) countSpan.textContent = `(${count})`;
+    renderRatingComments(comments, Array.isArray(data.ratings) ? data.ratings : []);
+  } catch {
+    if (comments){
+      comments.innerHTML = `<p class="rating-error">Bewertungen konnten nicht geladen werden.</p>`;
+    }
+  }
+}
+
+function resolveAuthorName(){
+  try{
+    const auth = getAuth();
+    if (auth && typeof auth.name === "string"){
+      const trimmed = auth.name.trim();
+      if (trimmed) return trimmed;
+    }
+    if (auth && typeof auth.email === "string"){
+      const base = auth.email.split("@")[0] || "";
+      const normalized = base.replace(/\./g, " ").trim();
+      if (normalized){
+        return normalized.replace(/\b\w/g, (c) => c.toUpperCase());
+      }
+    }
+  } catch {}
+  return "QuickDoc Nutzer:in";
+}
+
+function initRatingSection($card, doctor, initialStat = {}){
+  const container = $card.querySelector(".doctor__ratings");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  const ratingRow = document.createElement("div");
+  ratingRow.className = "rating-row";
+  const starsSpan = document.createElement("span");
+  starsSpan.className = "rating-stars";
+  starsSpan.innerHTML = renderStars(Number(initialStat.avg_rating) || 0);
+  const countSpan = document.createElement("span");
+  countSpan.className = "rating-count";
+  countSpan.textContent = `(${initialStat.rating_count || 0})`;
+  const toggleBtn = document.createElement("button");
+  toggleBtn.type = "button";
+  toggleBtn.className = "rate-toggle";
+  toggleBtn.textContent = "Bewerten";
+  toggleBtn.setAttribute("aria-expanded", "false");
+  ratingRow.append(starsSpan, countSpan);
+
+  const form = document.createElement("div");
+  form.className = "rating-form";
+  form.innerHTML = `
+    ${renderStars(0, { clickable: true })}
+    <textarea placeholder="Kommentar (optional)"></textarea>
+    <button class="btn btn-primary btn-sm" type="button">Senden</button>
+  `;
+  form.hidden = true;
+  form.setAttribute("aria-label", "Bewertung abgeben");
+
+  const commentsToggle = document.createElement("button");
+  commentsToggle.type = "button";
+  commentsToggle.className = "ratings-toggle";
+  commentsToggle.textContent = "Bewertungen anzeigen";
+  commentsToggle.setAttribute("aria-expanded", "false");
+
+  const commentsWrapper = document.createElement("div");
+  commentsWrapper.className = "rating-comments-wrapper collapsed";
+
+  const comments = document.createElement("div");
+  comments.className = "rating-comments";
+  comments.setAttribute("aria-live", "polite");
+  comments.innerHTML = `<p class="rating-empty muted">Bewertungen werden geladen …</p>`;
+
+  commentsWrapper.append(comments);
+
+  ratingRow.append(commentsToggle);
+  ratingRow.append(toggleBtn);
+
+  container.append(ratingRow, form, commentsWrapper);
+
+  const starButtons = Array.from(form.querySelectorAll(".star-btn"));
+  const submitBtn = form.querySelector(".btn");
+  const commentInput = form.querySelector("textarea");
+  let chosen = 0;
+
+  setStarSelection(starButtons, chosen);
+
+  if (commentInput){
+    commentInput.setAttribute("maxlength", "500");
+    commentInput.rows = 2;
+  }
+
+  starButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      chosen = Number(btn.dataset.score) || 0;
+      setStarSelection(starButtons, chosen);
+    });
+  });
+
+  toggleBtn.addEventListener("click", () => {
+    const willOpen = form.hidden;
+    if (willOpen){
+      form.hidden = false;
+      form.classList.add("show");
+      toggleBtn.textContent = "Abbrechen";
+      if (commentInput){
+        try {
+          commentInput.focus({ preventScroll: true });
+        } catch {
+          commentInput.focus();
+        }
+      }
+      toggleBtn.setAttribute("aria-expanded", "true");
+    } else {
+      form.classList.remove("show");
+      form.hidden = true;
+      toggleBtn.textContent = "Bewerten";
+      toggleBtn.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  submitBtn.addEventListener("click", async () => {
+    if (!isLoggedIn){
+      alert("Bitte logge dich ein, um zu bewerten.");
+      location.href = "/login.html";
+      return;
+    }
+    if (!chosen){
+      alert("Bitte Sterne auswählen (1–5).");
+      return;
+    }
+    const comment = commentInput.value.trim();
+    const authorName = resolveAuthorName();
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Senden…";
+    try{
+      const response = await fetch(`${API}/doctors/${doctor.id}/ratings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ score: chosen, comment, authorName })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.error){
+        throw new Error(data.error || "Fehler bei der Bewertung");
+      }
+      chosen = 0;
+      setStarSelection(starButtons, 0);
+      commentInput.value = "";
+      form.classList.remove("show");
+      form.hidden = true;
+      toggleBtn.textContent = "Bewerten";
+      toggleBtn.setAttribute("aria-expanded", "false");
+      if (starsSpan && data.avg_rating !== undefined){
+        starsSpan.innerHTML = renderStars(Number(data.avg_rating) || 0);
+      }
+      if (countSpan && data.rating_count !== undefined){
+        countSpan.textContent = `(${data.rating_count || 0})`;
+      }
+      await loadDoctorRatings(doctor.id, { starsSpan, countSpan, comments });
+      if (commentsWrapper.classList.contains("collapsed")){
+        commentsWrapper.classList.remove("collapsed");
+        commentsToggle.textContent = "Bewertungen verbergen";
+        commentsToggle.setAttribute("aria-expanded", "true");
+      }
+    } catch (err){
+      alert(err.message || "Fehler bei der Bewertung");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Senden";
+    }
+  });
+
+  commentsToggle.addEventListener("click", () => {
+    const isCollapsed = commentsWrapper.classList.contains("collapsed");
+    if (isCollapsed){
+      commentsWrapper.classList.remove("collapsed");
+      commentsToggle.textContent = "Bewertungen verbergen";
+      commentsToggle.setAttribute("aria-expanded", "true");
+    } else {
+      commentsWrapper.classList.add("collapsed");
+      commentsToggle.textContent = "Bewertungen anzeigen";
+      commentsToggle.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  loadDoctorRatings(doctor.id, { starsSpan, countSpan, comments });
+}
+
 function renderPagination(page, totalPages) {
   let pager = document.getElementById("pager");
   if (!pager) {
@@ -180,7 +463,55 @@ async function renderDoctors(){
 
     node.querySelector(".doctor__title").textContent = `Dr. ${d.first_name} ${d.last_name}`;
     node.querySelector(".doctor__subtitle").textContent = d.specialty;
-    node.querySelector(".doctor__meta").textContent = `${d.email} · ${d.phone}`;
+
+    const emailLink = node.querySelector(".doctor__email");
+    if (emailLink){
+      emailLink.textContent = d.email || "Keine E-Mail hinterlegt";
+      if (d.email){
+        emailLink.href = `mailto:${d.email}`;
+      } else {
+        emailLink.removeAttribute("href");
+      }
+    }
+
+    const phoneLink = node.querySelector(".doctor__phone");
+    if (phoneLink){
+      const cleanPhone = (d.phone || "").trim();
+      if (cleanPhone){
+        const telHref = cleanPhone.replace(/[^+\d]/g, "");
+        phoneLink.textContent = cleanPhone;
+        phoneLink.href = `tel:${telHref}`;
+      } else {
+        phoneLink.textContent = "Keine Telefonnummer hinterlegt";
+        phoneLink.removeAttribute("href");
+      }
+    }
+
+    const list = node.querySelector(".doctor__addresses");
+    if (list){
+      list.innerHTML = "";
+      const addresses = parseAddresses(d.addresses);
+      if (addresses.length){
+        addresses.forEach(loc => {
+          const li = document.createElement("li");
+          li.className = "doctor__address";
+          const street = document.createElement("span");
+          street.className = "doctor__address-street";
+          street.textContent = loc.street || "Adresse unbekannt";
+          const city = document.createElement("span");
+          city.className = "doctor__address-city";
+          city.textContent = `${loc.zip || ""} ${loc.city || ""}`.trim();
+          li.appendChild(street);
+          li.appendChild(city);
+          list.appendChild(li);
+        });
+      } else {
+        const li = document.createElement("li");
+        li.className = "doctor__address";
+        li.textContent = "Keine Praxisadresse hinterlegt";
+        list.appendChild(li);
+      }
+    }
 
     // Nächsten freien Slot laden
     getJSON(`${API}/doctors/${d.id}/nextSlot`).then(next => {
@@ -191,75 +522,8 @@ async function renderDoctors(){
       node.querySelector(".doctor__next").textContent = "Keine Slot-Info verfügbar";
     });
 
-    // Standorte laden
-    getJSON(`${API}/doctors/${d.id}/locations`).then(locs => {
-      const meta = node.querySelector(".doctor__meta");
-      if (Array.isArray(locs) && locs.length){
-        meta.textContent += ` · ${locs.map(l => `${l.city} (${l.zip})`).join(", ")}`;
-      }
-    }).catch(()=>{});
-
-    // Rating anzeigen + Formular (per Toggle)
-    const stat = statsMap[d.id] || { avg_rating: 0, rating_count: 0 };
-    const ratingHTML = `
-      <div class="rating-row">
-        ${renderStars(stat.avg_rating)}
-        <span class="rating-count">(${stat.rating_count || 0})</span>
-        <button class="rate-toggle" type="button">Bewerten</button>
-      </div>
-      <div class="rating-form" data-doc="${d.id}">
-        ${renderStars(0, { clickable: true })}
-        <textarea placeholder="Kommentar (optional)"></textarea>
-        <button class="btn btn-primary btn-sm" type="button">Senden</button>
-      </div>
-    `;
-    const nextEl = node.querySelector(".doctor__next");
-    nextEl.insertAdjacentHTML("afterend", ratingHTML);
-
-    const $form = $card.querySelector(`.rating-form[data-doc="${d.id}"]`);
-    const $toggle = nextEl.parentElement.querySelector(".rate-toggle");
-
-    // Toggle Formular anzeigen/verstecken
-    $toggle.addEventListener("click", () => {
-      $form.classList.toggle("show");
-    });
-
-    // Sternwahl im Formular
-    let chosen = 0;
-    $form.querySelectorAll(".star-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        chosen = Number(btn.dataset.score);
-        $form.querySelectorAll(".star-svg").forEach((svg, idx) => {
-          svg.classList.toggle("star-svg--full", idx < chosen);
-          svg.classList.toggle("star-svg--empty", idx >= chosen);
-        });
-      });
-    });
-
-    // Bewertung senden
-    $form.querySelector(".btn").addEventListener("click", async () => {
-      if (!isLoggedIn){
-        alert("Bitte logge dich ein, um zu bewerten.");
-        location.href = "/login.html";
-        return;
-      }
-      if (!chosen) { alert("Bitte Sterne auswählen (1–5)."); return; }
-      const comment = $form.querySelector("textarea").value.trim();
-
-      const r = await fetch(`${API}/doctors/${d.id}/ratings`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ score: chosen, comment })
-      });
-      const data = await r.json().catch(() => ({}));
-      if (!r.ok) { alert(data.error || "Fehler bei der Bewertung"); return; }
-
-      // Anzeige aktualisieren und Formular einklappen/entfernen
-      const row = nextEl.parentElement.querySelector(".rating-row");
-      row.innerHTML = `${renderStars(data.avg_rating)} <span class="rating-count">(${data.rating_count})</span> <button class="rate-toggle" type="button">Bewerten</button>`;
-      $form.classList.remove("show");
-      $form.remove();
-    });
+    const ratingStat = statsMap[d.id] || { avg_rating: 0, rating_count: 0 };
+    initRatingSection($card, d, ratingStat);
 
     // Slots anzeigen Button
     node.querySelector(".view-slots").addEventListener("click", async (e) => {

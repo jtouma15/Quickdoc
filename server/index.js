@@ -110,10 +110,20 @@ app.get("/api/doctors", (req, res) => {
   const where = clauses.length ? "WHERE " + clauses.join(" AND ") : "";
   const sql = `
     SELECT d.id, d.first_name, d.last_name, s.name AS specialty,
-           d.phone, d.email
+           d.phone, d.email,
+           COALESCE(json_group_array(
+             CASE WHEN l.id IS NULL THEN NULL ELSE json_object(
+               'street', l.street,
+               'city', l.city,
+               'zip', l.zip
+             ) END
+           ), '[]') AS addresses
     FROM doctors d
     JOIN specialties s ON s.id = d.specialty_id
+    LEFT JOIN doctor_locations dl ON dl.doctor_id = d.id
+    LEFT JOIN locations l ON l.id = dl.location_id
     ${where}
+    GROUP BY d.id
     ORDER BY s.name, d.last_name, d.first_name
     LIMIT 100
   `;
@@ -194,7 +204,7 @@ app.get("/api/doctors/:id/ratings", (req, res) => {
   if (!Number.isFinite(id)) return res.status(400).json({ error: "bad_id" });
 
   const list = db.prepare(`
-    SELECT id, score, comment, created_at
+    SELECT id, score, comment, created_at, author_name
     FROM ratings
     WHERE doctor_id = ?
     ORDER BY created_at DESC
@@ -212,21 +222,30 @@ app.get("/api/doctors/:id/ratings", (req, res) => {
 // Bewertung anlegen (1..5 Sterne + optional Kommentar)
 app.post("/api/doctors/:id/ratings", (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const { score, comment } = req.body || {};
+  const { score, comment, authorName } = req.body || {};
   if (!Number.isFinite(id)) return res.status(400).json({ error: "bad_id" });
   const s = parseInt(score, 10);
   if (!(s >= 1 && s <= 5)) return res.status(400).json({ error: "score_1_5" });
 
-  db.prepare(`
-    INSERT INTO ratings (doctor_id, score, comment) VALUES (?, ?, ?)
-  `).run(id, s, (comment || "").toString().slice(0, 500));
+  const safeComment = (comment || "").toString().slice(0, 500);
+  const safeAuthor = ((authorName ?? "").toString().trim().slice(0, 80)) || "QuickDoc Nutzer:in";
+
+  const result = db.prepare(`
+    INSERT INTO ratings (doctor_id, score, comment, author_name) VALUES (?, ?, ?, ?)
+  `).run(id, s, safeComment, safeAuthor);
 
   const stat = db.prepare(`
     SELECT ROUND(AVG(score),2) AS avg_rating, COUNT(*) AS rating_count
     FROM ratings WHERE doctor_id = ?
   `).get(id) || { avg_rating: s, rating_count: 1 };
 
-  res.json({ ok: true, ...stat });
+  const rating = db.prepare(`
+    SELECT id, score, comment, created_at, author_name
+    FROM ratings
+    WHERE id = ?
+  `).get(result.lastInsertRowid);
+
+  res.json({ ok: true, ...stat, rating });
 });
 
 // >>> wichtig: Root-Route: wenn vorhanden, home.html ausliefern, sonst index.html

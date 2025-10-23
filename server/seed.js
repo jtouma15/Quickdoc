@@ -54,6 +54,7 @@ db.exec(`
     doctor_id INTEGER NOT NULL,
     score INTEGER NOT NULL CHECK(score BETWEEN 1 AND 5),
     comment TEXT,
+    author_name TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (doctor_id) REFERENCES doctors(id)
   );
@@ -128,7 +129,7 @@ for (let i = 0; i < 40; i++) {
 }
 
 // Seed ratings: each doctor gets a varied distribution and some comments
-const insRating = db.prepare(`INSERT INTO ratings (doctor_id, score, comment) VALUES (?, ?, ?)`);
+const insRating = db.prepare(`INSERT INTO ratings (doctor_id, score, comment, author_name) VALUES (?, ?, ?, ?)`);
 const sampleComments = [
   "Sehr freundlich und kompetent.",
   "Kurze Wartezeit, alles top organisiert.",
@@ -156,7 +157,8 @@ for (const dId of doctorIds) {
     const score = clamp(Math.round(raw), 1, 5);
     const withComment = Math.random() < 0.55; // ~55% mit Kommentar
     const comment = withComment ? sampleComments[Math.floor(Math.random()*sampleComments.length)] : null;
-    insRating.run(dId, score, comment);
+    const author = `${pick(firstNames)} ${pick(lastNames)}`;
+    insRating.run(dId, score, comment, author);
   }
 }
 
