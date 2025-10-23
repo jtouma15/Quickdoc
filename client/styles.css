@@ -291,11 +291,55 @@ input:focus, select:focus{
 
 /* Results / Doctor cards */
 #results{ display:grid; gap:16px; margin-bottom: 64px; }
-.doctor{ display:grid; gap:10px; }
-.doctor__header{ display:flex; gap:12px; align-items:baseline; justify-content:space-between; }
+.doctor{ display:grid; gap:14px; }
+.doctor__header{ display:flex; gap:12px; align-items:baseline; justify-content:space-between; flex-wrap:wrap; }
 .doctor__title{ font-size:20px; font-weight:800; color: var(--ink); }
 .doctor__subtitle{ color:var(--muted); }
-.doctor__meta{ color:var(--text); }
+.doctor__contact{
+  display:grid;
+  gap:12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.doctor__contact-item{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  color: var(--text);
+}
+.doctor__contact-item--full{
+  grid-column: 1 / -1;
+}
+.doctor__label{
+  font-size:0.76rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color: var(--muted);
+}
+.doctor__contact-item a{
+  color: var(--brand-2);
+  font-weight:600;
+  text-decoration:none;
+  word-break: break-word;
+}
+.doctor__contact-item a:hover,
+.doctor__contact-item a:focus{
+  text-decoration: underline;
+}
+.doctor__addresses{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:grid;
+  gap:6px;
+}
+.doctor__address{
+  display:grid;
+  gap:2px;
+}
+.doctor__address-city{
+  color: var(--muted);
+  font-size:0.95em;
+}
 .doctor__next{ font-weight:700; color: var(--brand-2); }
 .hidden{ display:none; }
 
@@ -537,8 +581,47 @@ a:hover { text-decoration: underline; text-decoration-color: currentColor; }
 .dot--active{ background: var(--brand-2); }
 
 /* ------- Rating UI v2 (SVG-based) ------- */
-.rating-row { display:flex; align-items:center; gap:10px; margin-top:10px; }
+.doctor__ratings{
+  display:grid;
+  gap:12px;
+}
+.rating-row {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:4px;
+}
+.rating-stars .stars{
+  display:inline-flex;
+}
 .rating-count { color: var(--muted); font-size:.95em; }
+.rating-comments-wrapper{
+  display:grid;
+  gap:8px;
+}
+.rating-comments-wrapper.collapsed{
+  display:none;
+}
+.ratings-toggle{
+  background:none;
+  border:0;
+  color: var(--brand-2);
+  font-weight:600;
+  cursor:pointer;
+  padding:0;
+}
+.ratings-toggle:hover,
+.ratings-toggle:focus{
+  text-decoration: underline;
+}
+.rating-comments-wrapper.collapsed .rating-comments{
+  display:none;
+}
+.rating-comments-wrapper.collapsed .rating-empty,
+.rating-comments-wrapper.collapsed .rating-error{
+  display:none;
+}
 
 /* Anzeige- und klickbare Sterne */
 .stars { display:inline-flex; gap:6px; vertical-align:middle; }
@@ -552,18 +635,60 @@ a:hover { text-decoration: underline; text-decoration-color: currentColor; }
 .rate-toggle { background:none; border:0; color:var(--brand-2); font-weight:700; cursor:pointer; }
 .rate-toggle:hover { text-decoration: underline; }
 
-.rating-form { display:none; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+.rating-form { display:none; align-items:flex-start; gap:10px; margin-top:8px; flex-wrap:wrap; }
 .rating-form.show { display:flex; }
-.rating-form textarea { 
-  min-width: 240px; 
-  max-width: 100%; 
-  height: 34px; 
-  padding:8px 10px; 
-  border-radius:10px; 
-  border:1px solid rgba(0,0,0,.08); 
-  background:#fff; 
+.rating-form textarea {
+  min-width: 240px;
+  max-width: 100%;
+  flex: 1;
+  min-height: 40px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.08);
+  background: #fff;
+  resize: vertical;
 }
 .rating-form .btn { padding: 8px 12px; }
+
+.rating-comments{
+  display:grid;
+  gap:12px;
+}
+.rating-comment{
+  padding:12px 14px;
+  border-radius: 14px;
+  border:1px solid rgba(17,163,158,.12);
+  background: rgba(255,255,255,.86);
+  box-shadow: 0 8px 20px rgba(12,126,121,.08);
+}
+.rating-comment__header{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.rating-comment__author{
+  font-weight:700;
+  color: var(--ink);
+}
+.rating-comment__stars .stars{
+  gap:4px;
+}
+.rating-comment__time{
+  color: var(--muted);
+  font-size:.85em;
+}
+.rating-comment__text{
+  margin:6px 0 0;
+  color: var(--text);
+}
+.rating-empty,
+.rating-error{
+  margin:0;
+}
+.rating-error{
+  color:#b00020;
+}
 
 /* --- Testimonials visuals --- */
 .testi__avatar { 
