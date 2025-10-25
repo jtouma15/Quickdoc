@@ -142,16 +142,6 @@
   </section>
 </main>
 
-  <div id="cookieBanner" class="cookie-banner" role="dialog" aria-live="polite" hidden>
-    <div class="cookie-banner__inner">
-      <p class="cookie-banner__text">
-        Wir verwenden Cookies für grundlegende Funktionen dieser Demo. Weitere Infos findest du in unserer
-        <a href="/img/Datenschutz+.pdf" target="_blank" rel="noopener">Datenschutzerklärung</a>.
-      </p>
-      <button type="button" class="btn btn-primary btn-sm" id="cookieAccept">Einverstanden</button>
-    </div>
-  </div>
-
   <footer class="site-footer">
     <div class="container site-footer__inner">
       <span class="site-footer__brand">© <span id="year"></span> QuickDoc</span>
@@ -168,26 +158,6 @@
       const y=document.getElementById('year'); if (y) y.textContent=new Date().getFullYear();
       const prv=document.getElementById('openPrivacy'); const dlg=document.getElementById('privacyDialog');
       if (prv && dlg) prv.addEventListener('click', e=>{ e.preventDefault(); dlg.showModal(); });
-
-      const COOKIE_KEY='qd_cookie_accept';
-      const banner=document.getElementById('cookieBanner');
-      const btn=document.getElementById('cookieAccept');
-      if (banner && btn){
-        const hideBanner=()=>{
-          banner.classList.add('cookie-banner--hide');
-          setTimeout(()=> banner.remove(), 300);
-        };
-        if (localStorage.getItem(COOKIE_KEY)==='1'){
-          banner.remove();
-        } else {
-          banner.hidden=false;
-          banner.classList.add('cookie-banner--visible');
-          btn.addEventListener('click', ()=>{
-            localStorage.setItem(COOKIE_KEY,'1');
-            hideBanner();
-          });
-        }
-      }
     })();
   </script>
   <script src="./auth-state.js"></script>
