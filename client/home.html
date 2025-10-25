@@ -26,7 +26,9 @@
   </header>
 
   <main class="container home">
-  <!-- Hero -->
+
+
+  <!-- Hauptbereich -->
   <section class="card hero hero--split">
     <div class="hero__copy">
       <h1>Willkommen</h1>
@@ -50,7 +52,7 @@
     </div>
   </section>
 
-  <!-- Features -->
+  <!-- Was die Seite macht -->
   <section class="features">
     <article class="card feature">
       <img src="/img/feature-fachrichtungen.jpg" alt="Fachrichtungen" class="feature__img">
@@ -69,7 +71,7 @@
     </article>
   </section>
 
-  <!-- How it works -->
+  <!-- Wie die Seite funktioniert -->
   <section class="card how" id="how">
     <h2>So funktioniert’s</h2>
     <div class="steps">
@@ -151,14 +153,6 @@
     </div>
   </footer>
 
-  <dialog id="privacyDialog" class="legal-dialog">
-    <form method="dialog">
-      <h2>Datenschutzerklärung</h2>
-      <p>Dies ist eine Demo-Anwendung. Es werden keine personenbezogenen Daten dauerhaft gespeichert.</p>
-      <div class="dialog-actions"><button class="btn btn-outline">Schließen</button></div>
-    </form>
-  </dialog>
-
   <script>
     (function(){
       const y=document.getElementById('year'); if (y) y.textContent=new Date().getFullYear();
@@ -168,8 +162,11 @@
   </script>
   <script src="./auth-state.js"></script>
 <script>
-  // Mini-Slider für Testimonials (autoplay + Dots)
-  (function(){
+
+
+ // Slider für Testimonials
+
+ (function(){
     const track = document.getElementById('testiTrack');
     const dotsC = document.getElementById('testiDots');
     if(!track || !dotsC) return;
