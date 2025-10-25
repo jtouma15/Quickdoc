@@ -12,6 +12,8 @@ console.log("✅ .env geladen:", process.env.SMTP_HOST, process.env.MAIL_FROM);
 
 import nodemailer from 'nodemailer';
 
+const SERVER_BOOT_ID = Date.now().toString(36);
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT || 2525),
@@ -80,6 +82,10 @@ app.post("/api/logout", (req, res) => {
 
 app.get("/api/me", (req, res) => {
   res.json(req.session.user || null);
+});
+
+app.get("/api/server-info", (_req, res) => {
+  res.json({ bootId: SERVER_BOOT_ID });
 });
 
 // API
