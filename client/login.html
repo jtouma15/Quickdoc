@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body class="auth-page">
+
   <header class="site-hero">
     <div class="container site-hero__inner">
       <a href="/" class="site-hero__brand">
@@ -16,13 +17,15 @@
           <span class="site-hero__descriptor">Login für Patient:innen</span>
         </div>
       </a>
-      <nav class="site-hero__nav" aria-label="Hauptnavigation">
-      </nav>
+
+      <nav class="site-hero__nav" aria-label="Hauptnavigation"></nav>
+
       <div class="site-hero__actions">
         <span class="site-hero__action user-badge hidden" data-user-firstname hidden></span>
         <a href="/home.html" class="site-hero__action" title="Startseite">Zur Startseite</a>
         <a href="/arztlogin.html" class="site-hero__action" title="Praxis registrieren">Praxis registrieren</a>
       </div>
+
       <p class="site-hero__tagline">Melde dich an oder registriere dich, um Termine zu buchen.</p>
     </div>
   </header>
@@ -30,16 +33,20 @@
   <main class="auth-main">
     <div class="container auth-main__inner">
       <form id="loginForm" class="card auth-card">
+
         <label>E-Mail
           <input id="loginEmail" type="email" placeholder="you@example.com" required>
         </label>
+
         <label>Passwort
           <input id="loginPassword" type="password" placeholder="••••••••" required>
         </label>
+
         <div class="auth-card__actions">
           <button class="btn btn-outline" type="button" id="toRegister">Noch kein Konto? Jetzt registrieren!</button>
           <button class="btn btn-primary" type="submit" id="loginBtn">Login</button>
         </div>
+
         <div id="loginMsg" class="muted"></div>
       </form>
     </div>
@@ -62,21 +69,33 @@
       <div class="dialog-actions"><button class="btn btn-outline">Schließen</button></div>
     </form>
   </dialog>
+
   <script src="./cookie-banner.js"></script>
   <script src="./auth-state.js"></script>
   <script src="./app.js"></script>
 
   <script>
     (function(){
-      // Jahr & Datenschutz-Dialog
-      const y=document.getElementById('year'); if (y) y.textContent=new Date().getFullYear();
-      const prv=document.getElementById('openPrivacy'); const dlg=document.getElementById('privacyDialog');
-      if (prv && dlg) prv.addEventListener('click', e=>{ e.preventDefault(); dlg.showModal(); });
+      // Jahr aktualisieren
+      const yearElement = document.getElementById('year');
+      if (yearElement) {
+      yearElement.textContent = new Date().getFullYear();
+      }
 
-      // Enter auf Passwort triggert Submit automatisch, da es ein echtes <form> ist
+      // Datenschutz-Dialog öffnen
+      const privacyLink = document.getElementById('openPrivacy');
+      const privacyDialog = document.getElementById('privacyDialog');
+      // Nur ausführen, wenn beide Elemente existieren
+      if (privacyLink && privacyDialog) {
+       privacyLink.addEventListener('click', (event) => {
+       event.preventDefault();
+       privacyDialog.showModal();
+       });
+      }
+
+      // Navigieren zur Registrierungsseite
       const toReg = document.getElementById('toRegister');
-
-      toReg?.addEventListener('click', (e)=>{
+      toReg?.addEventListener('click', (e) => {
         e.preventDefault();
         location.href = '/register.html';
       });
