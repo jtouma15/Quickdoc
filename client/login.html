@@ -63,12 +63,7 @@
     </div>
   </footer>
 
-  <dialog id="privacyDialog" class="legal-dialog">
-    <form method="dialog"><h2>Datenschutzerklärung</h2>
-      <p>Dies ist eine Demo-Anwendung.</p>
-      <div class="dialog-actions"><button class="btn btn-outline">Schließen</button></div>
-    </form>
-  </dialog>
+  
 
   <script src="./cookie-banner.js"></script>
   <script src="./auth-state.js"></script>
@@ -80,17 +75,6 @@
       const yearElement = document.getElementById('year');
       if (yearElement) {
       yearElement.textContent = new Date().getFullYear();
-      }
-
-      // Datenschutz-Dialog öffnen
-      const privacyLink = document.getElementById('openPrivacy');
-      const privacyDialog = document.getElementById('privacyDialog');
-      // Nur ausführen, wenn beide Elemente existieren
-      if (privacyLink && privacyDialog) {
-       privacyLink.addEventListener('click', (event) => {
-       event.preventDefault();
-       privacyDialog.showModal();
-       });
       }
 
       // Navigieren zur Registrierungsseite
