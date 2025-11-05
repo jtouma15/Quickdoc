@@ -933,13 +933,13 @@ a:hover { text-decoration: underline; text-decoration-color: currentColor; }
     background-image: none !important;
     padding-right: 2.25rem; /* Platz für unseren Pfeil */
 }
-/* dein bestehender Custom-Pfeil via .select:after bleibt – ergibt genau 1 Pfeil */
+
 
 /* Buttons gleich groß nebeneinander */
 .form-actions--equal {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: .75rem;
+  display: grid;
+  grid-template-columns: 1fr;  
+  justify-items: center;        
 }
 .form-actions--equal .btn {
     width: 100%;
