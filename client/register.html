@@ -15,10 +15,6 @@
           <strong class="site-hero__wordmark">QuickDoc</strong>
         </div>
       </a>
-      <nav class="site-hero__nav" aria-label="Hauptnavigation">
-        <a href="/index.html">Termin finden</a>
-        <a href="/home.html">Zurück zur Startseite</a>
-      </nav>
       <div class="site-hero__actions">
         <span class="site-hero__action user-badge hidden" data-user-firstname hidden></span>
         <a href="/login.html" class="site-hero__action" title="Zurück zum Login">Zurück zum Login</a>
@@ -31,7 +27,7 @@
     <div class="container auth-main__inner">
       <form id="registerForm" class="card auth-card" novalidate>
         <h1 style="margin:0;">Jetzt registrieren</h1>
-        <p class="muted" style="margin-top:-4px;">Kostenloses Demo-Konto für Patient:innen.</p>
+        <p class="muted" style="margin-top:-4px;">Kostenloses Konto für Patient:innen.</p>
 
         <div style="display:grid; gap:12px;">
           <label>Vorname
@@ -49,9 +45,9 @@
           <label>Passwort bestätigen
             <input id="regPasswordConfirm" type="password" name="passwordConfirm" placeholder="Passwort wiederholen" minlength="6" required />
           </label>
-          <label style="display:flex; gap:10px; align-items:flex-start;">
-            <input id="regPrivacy" type="checkbox" required style="margin-top:4px;" />
+          <label style="display:flex; flex-direction:row; align-items:center; gap:8px;">
             <span>Ich stimme der <a href="/impressum.html">Datenschutzerklärung</a> von QuickDoc zu.</span>
+            <input id="regPrivacy" type="checkbox" required />
           </label>
         </div>
 

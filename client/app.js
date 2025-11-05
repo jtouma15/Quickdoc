@@ -1,5 +1,30 @@
 const API = "http://localhost:5173/api";
 
+const CITY_STREET_POOL = {
+  hamburg: ["Elbchaussee", "Alsterufer", "Binnenfeldredder", "Feldbrunnenstraße", "Dammtorstraße", "Glashüttenstraße", "Neuer Wall", "Palmaille"],
+  berlin: ["Unter den Linden", "Karl-Marx-Allee", "Torstraße", "Auguststraße", "Schönhauser Allee", "Friedrichstraße", "Invalidenstraße", "Gneisenaustraße"],
+  münchen: ["Residenzstraße", "Ludwigstraße", "Maximilianstraße", "Theresienstraße", "Sendlinger Straße", "Brienner Straße", "Gabelsbergerstraße", "Altstadtring"],
+  köln: ["Eigelstein", "Neumarkt", "Hahnenstraße", "Breite Straße", "Ehrenstraße", "Aachener Straße", "Brüsseler Straße", "Luxemburger Straße"],
+  frankfurt: ["Goethestraße", "Kaiserstraße", "Schillerstraße", "Hanauer Landstraße", "Fahrgasse", "Leipziger Straße", "Domstraße", "Schweizer Straße"],
+  stuttgart: ["Marienstraße", "Bolzstraße", "Thouretstraße", "Dorotheenstraße", "Friedrichstraße", "Eberhardstraße", "Theodor-Heuss-Straße", "Tübinger Straße"],
+  düsseldorf: ["Schadowstraße", "Kaiserstraße", "Köhlstraße", "Benrather Straße", "Bastionsstraße", "Bismarckstraße", "Breite Straße", "Ratinger Straße"],
+  leipzig: ["Petersstraße", "Nikolaistraße", "Grimmaische Straße", "Augustusplatz", "Gottschedstraße", "Hainstraße", "Windmühlenstraße", "Lindenauer Markt"]
+};
+const FALLBACK_STREETS = ["Hauptstraße", "Ringstraße", "Gartenweg", "Bahnhofstraße", "Schillerweg", "Goethestraße"];
+const cityStreetCounters = new Map();
+const doctorAddressOverrides = new Map(); // doctorId -> Map(addressKey -> override)
+
+function nextStreetForCity(cityName = "") {
+  const key = cityName.trim().toLowerCase() || "default";
+  const pool = CITY_STREET_POOL[key] || FALLBACK_STREETS;
+  const currentIndex = cityStreetCounters.get(key) || 0;
+  cityStreetCounters.set(key, currentIndex + 1);
+  const base = pool[currentIndex % pool.length];
+  const cycle = Math.floor(currentIndex / pool.length);
+  const number = 8 + cycle * 4;
+  return `${base} ${number}`;
+}
+
 // --- Pagination state ---
 const PAGE_SIZE = 7;    // max 7 Ärzte pro Seite
 let currentPage = 1;    // aktuelle Seite (1-basiert)
@@ -41,19 +66,69 @@ function formatDate(iso){
   return d.toLocaleString(undefined, { weekday:"short", day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
 }
 
-function parseAddresses(raw){
+function parseAddresses(raw, opts = {}){
+  const { preferredCity = "", doctorId = null } = opts || {};
   if (!raw) return [];
   try {
     const arr = JSON.parse(raw);
     if (!Array.isArray(arr)) return [];
-    return arr
+    const normalized = arr
       .filter(Boolean)
-      .slice(0, 1)
       .map(addr => ({
         street: addr.street || "",
         city: addr.city || "",
         zip: addr.zip || ""
-      }));
+      }))
+      .filter(addr => addr.street || addr.city || addr.zip);
+
+    if (!normalized.length) return [];
+
+    const wantedCity = preferredCity.trim().toLowerCase();
+    const source = wantedCity
+      ? normalized.filter(addr => (addr.city || "").trim().toLowerCase() === wantedCity)
+      : normalized;
+
+    const deduped = [];
+    const seen = new Set();
+    for (const addr of (source.length ? source : normalized)) {
+      const key = `${addr.street}|${addr.zip}|${addr.city}`.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        deduped.push(addr);
+      }
+    }
+
+    if (!doctorId) return deduped;
+
+    const docIdKey = Number(doctorId);
+    let docMap = doctorAddressOverrides.get(docIdKey);
+    if (!docMap) {
+      docMap = new Map();
+      doctorAddressOverrides.set(docIdKey, docMap);
+    }
+
+    const ensureOverride = (loc) => {
+      const baseCity = (loc.city || preferredCity || "").trim();
+      const key = [
+        baseCity.toLowerCase(),
+        (loc.zip || "").trim(),
+        (loc.street || "").trim().toLowerCase()
+      ].join("|");
+      if (!docMap.has(key)) {
+        const streetName = nextStreetForCity(baseCity);
+        docMap.set(key, {
+          street: streetName || loc.street || "Hauptstraße 1",
+          city: loc.city || preferredCity || "",
+          zip: loc.zip || ""
+        });
+      }
+      return docMap.get(key);
+    };
+
+    normalized.forEach(ensureOverride);
+
+    const subset = deduped.map(ensureOverride);
+    return subset;
   } catch {
     return [];
   }
@@ -456,6 +531,8 @@ async function renderDoctors(){
     return;
   }
 
+  const activeCityFilter = ($city.value || "").trim();
+
   for (const d of pageSlice){
     const node = tpl.content.cloneNode(true);
     const $card = node.querySelector(".doctor");
@@ -490,7 +567,7 @@ async function renderDoctors(){
     const list = node.querySelector(".doctor__addresses");
     if (list){
       list.innerHTML = "";
-      const addresses = parseAddresses(d.addresses);
+      const addresses = parseAddresses(d.addresses, { preferredCity: activeCityFilter, doctorId: d.id });
       if (addresses.length){
         addresses.forEach(loc => {
           const li = document.createElement("li");
