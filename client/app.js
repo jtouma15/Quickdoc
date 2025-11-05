@@ -128,7 +128,7 @@ function parseAddresses(raw, opts = {}){
     normalized.forEach(ensureOverride);
 
     const subset = deduped.map(ensureOverride);
-    return subset;
+    return subset.length ? [subset[0]] : [];
   } catch {
     return [];
   }
